@@ -1,4 +1,4 @@
-const enum mapBlockType{empty, normal, red, oButton, xButton, end};
+const enum mapBlockType{empty, normal, red, oButton, xButton, end, metal};
 class game{
     private file: Object;
     private filename: string;
@@ -43,8 +43,8 @@ class game{
             i++;
         for (let block in this.triggers[i].blocks) {
             if(this.map[block[1]][block[0]] === 0)
-                this.map[block[1]][block[0]] = 1;
-            else if(this.map[block[1]][block[0]] === 1)
+                this.map[block[1]][block[0]] = mapBlockType.metal;
+            else if(this.map[block[1]][block[0]] === mapBlockType.metal)
                 this.map[block[1]][block[0]] = 0;
         }
     }

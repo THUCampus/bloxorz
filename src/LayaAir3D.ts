@@ -4,7 +4,7 @@ class LayaAir3D {
         //初始化微信小游戏
         Laya.MiniAdpter.init();
         //初始化引擎
-        Laya3D.init(0, 0, true);
+        Laya3D.init(1334, 750, true);
         //适配模式
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -13,7 +13,8 @@ class LayaAir3D {
         Laya.Stat.show();
 
         //添加3D场景
-        let scene: Laya.Scene = Laya.stage.addChild(new Laya.Scene()) as Laya.Scene;
+        /*let scene: Laya.Scene = Laya.stage.addChild(new Laya.Scene()) as Laya.Scene;
+        
 
         //添加照相机
         let camera: Laya.Camera = (scene.addChild(new Laya.Camera(0, 0, 100))) as Laya.Camera;
@@ -39,6 +40,8 @@ class LayaAir3D {
         material.diffuseTexture = Laya.Texture2D.load("res/layabox.png");
         box1.meshRender.material = material;
         box3.meshRender.material = material;
+        */
+        Laya.stage.addChild(new ui.startUI());
     }
 }
 

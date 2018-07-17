@@ -8,8 +8,8 @@ var game = /** @class */ (function () {
                 i++;
             for (var block in _this.triggers[i].blocks) {
                 if (_this.map[block[1]][block[0]] === 0)
-                    _this.map[block[1]][block[0]] = 1;
-                else if (_this.map[block[1]][block[0]] === 1)
+                    _this.map[block[1]][block[0]] = 6 /* metal */;
+                else if (_this.map[block[1]][block[0]] === 6 /* metal */)
                     _this.map[block[1]][block[0]] = 0;
             }
         };
