@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":7,
+    "selecteID":8,
     "props":{"width":1334,"var":"startpage","sceneColor":"#000000","name":"start","height":750},
     "nodeParent":-1,
     "label":"View(startpage)",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"y":471,"x":414,"width":200,"var":"startButton","rotation":0,"mouseEnabled":true,"labelStrokeColor":"#ffffff","labelStroke":0,"labelSize":30,"label":"开始游戏","height":50},
+            "props":{"width":200,"var":"startButton","rotation":0,"mouseEnabled":true,"labelStrokeColor":"#ffffff","labelStroke":0,"labelSize":30,"labelAlign":"center","label":"开始游戏","height":50,"centerY":100,"centerX":-100,"blendMode":"lighter"},
             "nodeParent":1,
             "label":"Button(startButton)",
             "isDirectory":false,
@@ -28,7 +28,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"y":473,"x":741,"width":200,"var":"helpButton","rotation":0,"mouseEnabled":true,"labelStrokeColor":"#ffffff","labelStroke":0,"labelSize":30,"label":"游戏帮助","height":50},
+            "props":{"width":200,"var":"helpButton","rotation":0,"mouseEnabled":true,"labelStrokeColor":"#ffffff","labelStroke":0,"labelSize":30,"labelAlign":"center","label":"游戏帮助","height":50,"centerY":100,"centerX":100,"blendMode":"lighter"},
             "nodeParent":1,
             "label":"Button(helpButton)",
             "isDirectory":false,
@@ -41,13 +41,13 @@
         {
             "x":15,
             "type":"Image",
-            "props":{"y":147,"x":392,"skin":"Bloxorz_副本.png","cacheAs":"normal"},
+            "props":{"skin":"logo.png","centerY":-100,"centerX":0},
             "nodeParent":1,
             "label":"Image",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,
-            "compId":7,
+            "compId":8,
             "child":[
                 ]
         }],

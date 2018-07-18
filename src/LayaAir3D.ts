@@ -1,19 +1,25 @@
 // 程序入口
 class LayaAir3D {
+        public startui: ui.startUI;
+        public gameui: ui.gameUI;
+        public gamelogic: game;
     constructor() {
         //初始化微信小游戏
         Laya.MiniAdpter.init();
         //初始化引擎
         Laya3D.init(1334, 750, true);
         //适配模式
-        Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-        Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+        Laya.stage.scaleMode = Laya.Stage.SCALE_SHOWALL;
+        Laya.stage.alignH = "center";
+        Laya.stage.alignV = "center";
+        Laya.stage.screenMode = Laya.Stage.SCREEN_HORIZONTAL;
 
         //开启统计信息
         Laya.Stat.show();
 
         //添加3D场景
-        /*let scene: Laya.Scene = Laya.stage.addChild(new Laya.Scene()) as Laya.Scene;
+        let scene: Laya.Scene = Laya.stage.addChild(new Laya.Scene()) as Laya.Scene;
+        
         
 
         //添加照相机
@@ -40,8 +46,30 @@ class LayaAir3D {
         material.diffuseTexture = Laya.Texture2D.load("res/layabox.png");
         box1.meshRender.material = material;
         box3.meshRender.material = material;
-        */
-        Laya.stage.addChild(new ui.startUI());
+        Laya.stage.setChildIndex(scene,0);
+        let res: Array<any> = [{url:"arrow.png",type:Laya.Loader.IMAGE},
+         {url:"pause.png",type:Laya.Loader.IMAGE}];
+        Laya.loader.load(res,Laya.Handler.create(this, this.loadui), null)
+    }
+    loadui()
+    {
+        this.startui = new ui.startUI();
+        this.startui.startButton.on(Laya.Event.MOUSE_DOWN,this,this.loadgame);
+        Laya.stage.addChild(this.startui);
+        //this.helpButton.on(Laya.Event.MOUSE_DOWN,this,this.help);
+    }
+    loadgame()
+    {
+        Laya.stage.removeChild(this.startui);
+        this.gameui = new ui.gameUI();
+        Laya.stage.addChild(this.gameui);
+        this.gameui.pausebutton.on(Laya.Event.MOUSE_DOWN,this,this.backtomain);
+    }
+    backtomain()
+    {
+        Laya.stage.removeChild(this.gameui);
+        this.gameui.destroy();
+        Laya.stage.addChild(this.startui);
     }
 }
 
