@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":7,
+    "selecteID":3,
     "props":{"width":1334,"var":"gamepage","sceneColor":"#000000","name":"game","height":750},
     "nodeParent":-1,
     "label":"View(gamepage)",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":150,"visible":true,"var":"leftbutton","stateNum":"1","skin":"arrow.png","right":290,"mouseEnabled":true,"height":85,"bottom":165},
+            "props":{"width":150,"visible":true,"var":"leftbutton","stateNum":"2","skin":"arrow.png","right":290,"mouseEnabled":true,"height":85,"bottom":165},
             "nodeParent":1,
             "label":"Button(leftbutton)",
             "isDirectory":false,
@@ -28,7 +28,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":150,"var":"downbutton","stateNum":"1","skin":"arrow.png","rotation":270,"right":150,"mouseEnabled":true,"height":85,"bottom":-50},
+            "props":{"width":150,"var":"downbutton","stateNum":"2","skin":"arrow.png","rotation":270,"right":150,"mouseEnabled":true,"height":85,"bottom":-50},
             "nodeParent":1,
             "label":"Button(downbutton)",
             "isDirectory":false,
@@ -41,7 +41,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":150,"visible":true,"var":"rightbutton","stateNum":"1","skin":"arrow.png","rotation":180,"right":-80,"mouseEnabled":true,"height":85,"bottom":80},
+            "props":{"width":150,"visible":true,"var":"rightbutton","stateNum":"2","skin":"arrow.png","rotation":180,"right":-80,"mouseEnabled":true,"height":85,"bottom":80},
             "nodeParent":1,
             "label":"Button(rightbutton)",
             "isDirectory":false,
@@ -54,7 +54,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":150,"visible":true,"var":"upbutton","stateNum":"1","skin":"arrow.png","rotation":90,"right":65,"mouseEnabled":true,"height":85,"bottom":300},
+            "props":{"width":150,"visible":true,"var":"upbutton","stateNum":"2","skin":"arrow.png","rotation":90,"right":65,"mouseEnabled":true,"height":85,"bottom":300},
             "nodeParent":1,
             "label":"Button(upbutton)",
             "isDirectory":false,

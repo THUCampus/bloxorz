@@ -50,9 +50,6 @@ class game{
     }
     update = () =>
     {
-        //win
-        if(this.blockVertical && this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.end)
-            return 2;
         //lose
         if(this.pos[0][0] < 0 || this.pos[1][0] > this.size[0] || this.pos[0][1] < 0 || this.pos[1][1] > this.size[1])
             return 0;
@@ -60,6 +57,9 @@ class game{
             return 0;
         if(!this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.empty || this.map[this.pos[1][1]-1][this.pos[1][0]-1] === mapBlockType.empty))
             return 0;
+        //win
+        if(this.blockVertical && this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.end)
+            return 2;
         //trigger
         if(this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.oButton || this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.xButton))
             this.trigger.apply(this.pos[0][0], this.pos[0][1]);
@@ -72,7 +72,6 @@ class game{
     }
     moveleft = () =>
     {
-        console.log();
         if(this.blockVertical)
         {
             this.blockVertical = false;
