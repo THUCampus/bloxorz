@@ -5,6 +5,7 @@ class LayaAir3D {
         public pauseui: ui.pauseUI;
         public finishui: ui.finishUI;
         public gamelogic: game;
+        public currentGame: GameView;
     constructor() {
         //初始化微信小游戏
         Laya.MiniAdpter.init();
@@ -40,7 +41,7 @@ class LayaAir3D {
         this.gameui.pausebutton.on(Laya.Event.MOUSE_DOWN,this,this.pause);
         Laya.stage.removeChild(this.startui);
         Laya.stage.addChild(this.gameui);
-        
+        this.currentGame = new GameView("res/map_0.json");
     }
     pause()
     {

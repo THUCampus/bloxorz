@@ -4,7 +4,7 @@
     "version": "30.0.0.134", 
     "x-flapper-revision": "91936", 
     "x-ppapi-arch": "x64", 
-    "x-ppapi-os": "win", 
+    "x-ppapi-os": "mac", 
     "x-ppapi-required-interfaces": [
         "PPB_AudioConfig;1.1|PPB_AudioConfig;1.0", 
         "PPB_AudioInput(Dev);0.4|PPB_AudioInput(Dev);0.3", 
