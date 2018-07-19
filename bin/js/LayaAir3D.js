@@ -31,6 +31,7 @@ var LayaAir3D = /** @class */ (function () {
         this.gameui.pausebutton.on(Laya.Event.MOUSE_DOWN, this, this.pause);
         Laya.stage.removeChild(this.startui);
         Laya.stage.addChild(this.gameui);
+        this.currentGame = new GameView("res/map_0.json");
     };
     LayaAir3D.prototype.pause = function () {
         this.pauseui = new ui.pauseUI();
