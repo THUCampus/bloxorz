@@ -158,16 +158,6 @@ var GameView = /** @class */ (function () {
         this.spotLight.range = 100;
         this.spotLight.spot = 12;
         this.spotLight.attenuation = new Laya.Vector3(0.01, 0.01, 0.01);
-        //test
-        this.addMessage(Operation.RIGHT);
-        this.addMessage(Operation.DOWN);
-        this.addMessage(Operation.LEFT);
-        this.addMessage(Operation.LEFT);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.RIGHT);
     };
     GameView.prototype.moveUp = function () {
         var up_pivot = new Laya.Vector3((this.cube1_pos.x + this.cube2_pos.x) / 2, -1, Math.min(this.cube1_pos.z, this.cube2_pos.z) - 0.5);
@@ -320,7 +310,7 @@ var GameView = /** @class */ (function () {
         }
         else {
             //异常处理
-            console.log("需要异常处理！");
+            console.log("updateCubePos需要异常处理！");
         }
     };
     GameView.prototype.fall_full = function (dir) {
@@ -339,7 +329,7 @@ var GameView = /** @class */ (function () {
                 break;
             default:
                 //异常处理
-                console.log("需要异常处理！");
+                console.log("fall_full需要异常处理！");
                 break;
         }
     };
@@ -362,7 +352,7 @@ var GameView = /** @class */ (function () {
         }
         else {
             //异常处理
-            console.log("需要异常处理！");
+            console.log("fall_half需要异常处理！");
         }
     };
     GameView.prototype.fall_straight = function () {
@@ -416,7 +406,8 @@ var GameView = /** @class */ (function () {
         }
     };
     GameView.prototype.checkMessageQueue = function () {
-        if (this.messageQueue === []) {
+        if (this.messageQueue.length === 0) {
+            console.log("ohmygod");
             this.messageBusy = false;
             return;
         }
@@ -437,7 +428,7 @@ var GameView = /** @class */ (function () {
                     break;
                 default:
                     //异常处理
-                    console.log("需要异常处理！");
+                    console.log("checkMessageQueue需要异常处理！");
                     break;
             }
         }

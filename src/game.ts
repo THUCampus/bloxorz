@@ -17,20 +17,20 @@ class game{
         this.triggers = this.file["triggers"];
         this.blockVertical = true;
     }
-    public move(direction: Number)
+    public move(direction: Operation)
     {
         switch(direction)
         {
-            case 1:
+            case Operation.UP:
                 this.moveup.apply(null);
                 break;
-            case 2:
+            case Operation.DOWN:
                 this.movedown.apply(null);
                 break;
-            case 3:
+            case Operation.LEFT:
                 this.moveleft.apply(null);
                 break;
-            case 4:
+            case Operation.RIGHT:
                 this.moveright.apply(null);
                 break; 
         }

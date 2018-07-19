@@ -159,17 +159,6 @@ class GameView {
         this.spotLight.range = 100;
         this.spotLight.spot = 12;
         this.spotLight.attenuation = new Laya.Vector3(0.01, 0.01, 0.01);
-        
-        //test
-        this.addMessage(Operation.RIGHT);
-        this.addMessage(Operation.DOWN);
-        this.addMessage(Operation.LEFT);
-        this.addMessage(Operation.LEFT);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.UP);
-        this.addMessage(Operation.RIGHT);
     }
     moveUp () {
         const up_pivot: Laya.Vector3 = new Laya.Vector3((this.cube1_pos.x + this.cube2_pos.x) / 2, -1, Math.min(this.cube1_pos.z, this.cube2_pos.z) - 0.5);
@@ -321,7 +310,7 @@ class GameView {
             this.cube2_pos = new Laya.Vector3(cube_x * 2 - center_x, 0, center_z);
         } else {
             //异常处理
-            console.log("需要异常处理！");
+            console.log("updateCubePos需要异常处理！");
         }
     }
     fall_full (dir: Direction) {
@@ -340,7 +329,7 @@ class GameView {
             break;
             default:
             //异常处理
-            console.log("需要异常处理！");
+            console.log("fall_full需要异常处理！");
             break;
         }
     }
@@ -359,7 +348,7 @@ class GameView {
             this.fallUp_half(pivot);
         } else {
             //异常处理
-            console.log("需要异常处理！");
+            console.log("fall_half需要异常处理！");
         }
     }
     fall_straight () {
@@ -411,7 +400,7 @@ class GameView {
         }
     }
     checkMessageQueue () {
-        if (this.messageQueue === []) {
+        if (this.messageQueue.length === 0) {
             this.messageBusy = false;
             return;
         } else {
@@ -431,7 +420,7 @@ class GameView {
                 break;
                 default:
                 //异常处理
-                console.log("需要异常处理！");
+                console.log("checkMessageQueue需要异常处理！");
                 break;
             }
         }

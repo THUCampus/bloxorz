@@ -24,14 +24,18 @@ var LayaAir3D = /** @class */ (function () {
     LayaAir3D.prototype.loadgame = function () {
         this.gamelogic = new game("1");
         this.gameui = new ui.gameUI();
-        this.gameui.upbutton.on(Laya.Event.MOUSE_DOWN, this.gamelogic, this.gamelogic.move, [1]);
-        this.gameui.downbutton.on(Laya.Event.MOUSE_DOWN, this.gamelogic, this.gamelogic.move, [2]);
-        this.gameui.leftbutton.on(Laya.Event.MOUSE_DOWN, this.gamelogic, this.gamelogic.move, [3]);
-        this.gameui.rightbutton.on(Laya.Event.MOUSE_DOWN, this.gamelogic, this.gamelogic.move, [4]);
+        this.gameui.upbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.UP]);
+        this.gameui.downbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.DOWN]);
+        this.gameui.leftbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.LEFT]);
+        this.gameui.rightbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.RIGHT]);
         this.gameui.pausebutton.on(Laya.Event.MOUSE_DOWN, this, this.pause);
         Laya.stage.removeChild(this.startui);
         Laya.stage.addChild(this.gameui);
         this.currentGame = new GameView("res/map_0.json");
+    };
+    LayaAir3D.prototype.move = function (direction) {
+        this.gamelogic.move(direction);
+        this.currentGame.addMessage(direction);
     };
     LayaAir3D.prototype.pause = function () {
         this.pauseui = new ui.pauseUI();
