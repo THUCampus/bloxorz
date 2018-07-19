@@ -25,10 +25,9 @@ class LayaAir3D {
     loadui()
     {
         this.startui = new ui.startUI();
-        this.startui.startButton.on(Laya.Event.MOUSE_DOWN,this,function(){Laya.loader.load("res/" + "1" + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON);});
+        this.startui.startButton.on(Laya.Event.MOUSE_DOWN,this,function(){Laya.loader.load("res/" + "1" + ".json", Laya.Handler.create(this,this.loadgame), null, Laya.Loader.JSON);});
         //this.startui.helpButton.on(Laya.Event.MOUSE_DOWN,this,this.help);
         Laya.stage.addChild(this.startui);
-        
     }
     loadgame()
     {
@@ -43,22 +42,41 @@ class LayaAir3D {
         Laya.stage.addChild(this.gameui);
         this.currentGame = new GameView("res/map_0.json");
     }
-    move (direction: Operation) {
-        this.gamelogic.move(direction);
+    move(direction: Operation)
+    {
         this.currentGame.addMessage(direction);
+        switch(this.gamelogic.move(direction))
+        {
+            case State.FAILURE:
+            this.restart();
+            break;
+            case State.SUCCESS:
+            console.log("win!");
+            break;
+        }
     }
     pause()
     {
         this.pauseui = new ui.pauseUI();
         this.pauseui.backToMain.on(Laya.Event.MOUSE_DOWN,this,this.backtomain);
+        this.pauseui.backToGame.on(Laya.Event.MOUSE_DOWN,this,function(){this.pauseui.close(); this.gameui.disabled = false;});
+        this.pauseui.restart.on(Laya.Event.MOUSE_DOWN,this,this.restart);
+        this.gameui.disabled = true;
         Laya.stage.addChild(this.pauseui);
+    }
+    restart()
+    {
+        this.pauseui.close();
+        Laya.stage.destroyChildren();
+        Laya.loader.clearRes("res/" + "1" + ".json");
+        Laya.loader.load("res/" + "1" + ".json", Laya.Handler.create(this,this.loadgame), null, Laya.Loader.JSON);
     }
     backtomain()
     {
         this.pauseui.close();
-        Laya.stage.removeChild(this.gameui);
-        this.gameui.destroy();
-        Laya.stage.addChild(this.startui);
+        Laya.stage.destroyChildren();
+        Laya.loader.clearRes("res/" + "1" + ".json");
+        this.loadui();
     }
 }
 

@@ -35,18 +35,27 @@ var LayaAir3D = /** @class */ (function () {
     };
     LayaAir3D.prototype.move = function (direction) {
         this.gamelogic.move(direction);
-        this.currentGame.addMessage(direction);
+        console.log(this.currentGame.addMessage(direction));
     };
     LayaAir3D.prototype.pause = function () {
         this.pauseui = new ui.pauseUI();
         this.pauseui.backToMain.on(Laya.Event.MOUSE_DOWN, this, this.backtomain);
+        this.pauseui.backToGame.on(Laya.Event.MOUSE_DOWN, this, function () { this.pauseui.close(); this.gameui.disabled = false; });
+        this.pauseui.restart.on(Laya.Event.MOUSE_DOWN, this, this.restart);
+        this.gameui.disabled = true;
         Laya.stage.addChild(this.pauseui);
+    };
+    LayaAir3D.prototype.restart = function () {
+        this.pauseui.close();
+        Laya.stage.destroyChildren();
+        Laya.loader.clearRes("res/" + "1" + ".json");
+        Laya.loader.load("res/" + "1" + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON);
     };
     LayaAir3D.prototype.backtomain = function () {
         this.pauseui.close();
-        Laya.stage.removeChild(this.gameui);
-        this.gameui.destroy();
-        Laya.stage.addChild(this.startui);
+        Laya.stage.destroyChildren();
+        Laya.loader.clearRes("res/" + "1" + ".json");
+        this.loadui();
     };
     return LayaAir3D;
 }());

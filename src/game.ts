@@ -4,12 +4,12 @@ class game{
     private filename: string;
     private map: Array<any>;
     private size: number[];
-    private pos: Array<Array<number>>;
+    public pos: Array<Array<number>>;
     private triggers: Array<any>;
     private blockVertical: Boolean;
     constructor(fileName: string)
-    {
-        this.filename = fileName;
+    { 
+         this.filename = fileName;
         this.file = Laya.loader.getRes("res/" + this.filename + ".json");
         this.map = this.file["map"];
         this.size = [this.map[0].length, this.map.length];
@@ -52,14 +52,14 @@ class game{
     {
         //lose
         if(this.pos[0][0] < 0 || this.pos[1][0] > this.size[0] || this.pos[0][1] < 0 || this.pos[1][1] > this.size[1])
-            return 0;
+            return State.FAILURE;
         if(this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.empty || this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.red))
-            return 0;
+            return State.FAILURE;
         if(!this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.empty || this.map[this.pos[1][1]-1][this.pos[1][0]-1] === mapBlockType.empty))
-            return 0;
+            return State.FAILURE;
         //win
         if(this.blockVertical && this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.end)
-            return 2;
+            return State.SUCCESS;
         //trigger
         if(this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.oButton || this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.xButton))
             this.trigger.apply(this.pos[0][0], this.pos[0][1]);
@@ -68,7 +68,7 @@ class game{
         if(!this.blockVertical && this.map[this.pos[1][1]-1][this.pos[1][0]-1] === mapBlockType.oButton)
             this.trigger.apply(this.pos[1][0]-1,this.pos[1][1]-1);
         //continue
-        return 1;
+        return State.GAMING;
     }
     moveleft = () =>
     {

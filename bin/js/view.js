@@ -407,7 +407,6 @@ var GameView = /** @class */ (function () {
     };
     GameView.prototype.checkMessageQueue = function () {
         if (this.messageQueue.length === 0) {
-            console.log("ohmygod");
             this.messageBusy = false;
             return;
         }
