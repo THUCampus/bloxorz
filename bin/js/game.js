@@ -16,14 +16,14 @@ var game = /** @class */ (function () {
         this.update = function () {
             //lose
             if (_this.pos[0][0] < 0 || _this.pos[1][0] > _this.size[0] || _this.pos[0][1] < 0 || _this.pos[1][1] > _this.size[1])
-                return 0;
+                return State.FAILURE;
             if (_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === 0 /* empty */ || _this.map[_this.pos[0][1]][_this.pos[0][0]] === 2 /* red */))
-                return 0;
+                return State.FAILURE;
             if (!_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === 0 /* empty */ || _this.map[_this.pos[1][1] - 1][_this.pos[1][0] - 1] === 0 /* empty */))
-                return 0;
+                return State.FAILURE;
             //win
             if (_this.blockVertical && _this.map[_this.pos[0][1]][_this.pos[0][0]] === 5 /* end */)
-                return 2;
+                return State.SUCCESS;
             //trigger
             if (_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === 3 /* oButton */ || _this.map[_this.pos[0][1]][_this.pos[0][0]] === 4 /* xButton */))
                 _this.trigger.apply(_this.pos[0][0], _this.pos[0][1]);
@@ -32,7 +32,7 @@ var game = /** @class */ (function () {
             if (!_this.blockVertical && _this.map[_this.pos[1][1] - 1][_this.pos[1][0] - 1] === 3 /* oButton */)
                 _this.trigger.apply(_this.pos[1][0] - 1, _this.pos[1][1] - 1);
             //continue
-            return 1;
+            return State.GAMING;
         };
         this.moveleft = function () {
             if (_this.blockVertical) {

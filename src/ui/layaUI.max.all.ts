@@ -41,8 +41,9 @@ module ui {
 
 module ui {
     export class helpUI extends Dialog {
+		public closeButton:Laya.Button;
 
-        public static  uiView:any ={"type":"Dialog","props":{"width":800,"height":600}};
+        public static  uiView:any ={"type":"Dialog","props":{"width":400,"height":600,"centerY":0,"centerX":0},"child":[{"type":"Button","props":{"width":30,"var":"closeButton","top":0,"stateNum":3,"skin":"btn_close.png","right":0,"name":"close","height":30}}]};
         constructor(){ super()}
         createChildren():void {
         
@@ -74,8 +75,11 @@ module ui {
 
 module ui {
     export class selectUI extends Dialog {
+		public closeButton:Laya.Button;
+		public level:Laya.ComboBox;
+		public select:Laya.Button;
 
-        public static  uiView:any ={"type":"Dialog","props":{"width":800,"height":600}};
+        public static  uiView:any ={"type":"Dialog","props":{"width":600,"height":300,"centerY":0,"centerX":0},"child":[{"type":"Button","props":{"width":30,"var":"closeButton","top":0,"stateNum":3,"skin":"btn_close.png","right":0,"name":"close","height":30}},{"type":"ComboBox","props":{"width":200,"var":"level","skin":"combobox.png","labels":"1,2,3","labelSize":30,"labelFont":"SimHei","height":50,"centerY":-50,"centerX":0}},{"type":"Button","props":{"width":150,"var":"select","stateNum":3,"skin":"button.png","labelSize":25,"labelFont":"SimHei","label":"确定","height":50,"centerY":50,"centerX":0}}]};
         constructor(){ super()}
         createChildren():void {
         

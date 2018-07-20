@@ -9,7 +9,7 @@ class game{
     private blockVertical: Boolean;
     constructor(fileName: string)
     { 
-         this.filename = fileName;
+        this.filename = fileName;
         this.file = Laya.loader.getRes("res/" + this.filename + ".json");
         this.map = this.file["map"];
         this.size = [this.map[0].length, this.map.length];
