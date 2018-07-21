@@ -85,6 +85,7 @@ var LayaAir3D = /** @class */ (function () {
         Laya.loader.load("res/map_" + this.currentLevel + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON);
     };
     LayaAir3D.prototype.backtomain = function () {
+        delete (this.currentGame);
         this.pauseui.close();
         Laya.stage.destroyChildren();
         Laya.timer.clearAll(this);

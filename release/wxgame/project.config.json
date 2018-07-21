@@ -9,7 +9,11 @@
 	},
 	"compileType": "game",
 	"libVersion": "game",
+<<<<<<< Updated upstream
 	"appid": "touristappid",
+=======
+	"appid": "wx4e51d4b384597930",
+>>>>>>> Stashed changes
 	"projectname": "%E5%B0%8F%E6%B8%B8%E6%88%8F%E6%B5%8B%E8%AF%95",
 	"condition": {
 		"search": {
@@ -28,6 +32,10 @@
 			"current": -1,
 			"list": []
 		}
+<<<<<<< Updated upstream
 	},
 	"isGameTourist": true
+=======
+	}
+>>>>>>> Stashed changes
 }

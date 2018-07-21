@@ -96640,6 +96640,10 @@ var LayaAir3D = /** @class */ (function () {
         Laya.stage.addChild(this.pauseui);
     };
     LayaAir3D.prototype.backtomain = function () {
+<<<<<<< Updated upstream
+=======
+        delete (this.currentGame);
+>>>>>>> Stashed changes
         this.pauseui.close();
         Laya.stage.removeChild(this.gameui);
         this.gameui.destroy();

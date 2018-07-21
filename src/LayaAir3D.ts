@@ -103,6 +103,7 @@ class LayaAir3D {
     }
     backtomain()
     {
+        delete(this.currentGame);
         this.pauseui.close();
         Laya.stage.destroyChildren();
         Laya.timer.clearAll(this);

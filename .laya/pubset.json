@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 {"1":{"sourcePath":"C:\\Users\\zzh\\Documents\\GitHub\\bloxorz\\bin","outPath":"C:\\Users\\zzh\\Documents\\GitHub\\bloxorz\\release\\wxgame","pngQualityLow":"65","pngQualityHigh":"80","jpgQuality":"85","mergeJs":true,"compressPng":true,"compressJpg":true,"compressJson":true,"jsontypes":"json,atlas,ls,lh,lmat,lav","compressJs":true,"enableVersion":false,"excludeFiles":"","publishType":1,"projectType":"ts","copyOutFiles":"","copyOutPath":"","userCmd":""},"pf":1}
+=======
+{"1":{"sourcePath":"/Users/buyiyang/Documents/bloxorz/bin","outPath":"/Users/buyiyang/Documents/bloxorz/release/wxgame","pngQualityLow":"65","pngQualityHigh":"80","jpgQuality":"85","mergeJs":true,"compressPng":false,"compressJpg":false,"compressJson":false,"jsontypes":"json,atlas,ls,lh,lmat,lav","compressJs":false,"enableVersion":false,"excludeFiles":"","publishType":1,"projectType":"ts","copyOutFiles":"","copyOutPath":"","userCmd":""},"pf":1}
+>>>>>>> Stashed changes

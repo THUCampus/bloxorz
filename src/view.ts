@@ -1,40 +1,51 @@
+//view.ts负责游戏中的所有的元素显示、运动效果和与此相关的部分逻辑
+//GameView类的一个实例对象就是一个游戏关卡
+
 enum Direction{UP, DOWN, LEFT, RIGHT};
 enum Operation{UP, DOWN, LEFT, RIGHT};
 enum Block{EMPTY, ORDINARY, IRON, MUBAN, LIGHT, HEAVY, FLASH, END};
 enum State{GAMING, SUCCESS, FAILURE};
 
 class GameView {
+    //Laya3D场景内容
+    //元素
     public scene: Laya.Scene;
-    public map_info: Array<Array<number>>;
     public map: Array<Array<Laya.MeshSprite3D>>;
-    public light: Laya.PointLight;
-    public light_range: number;
     public cube: Laya.MeshSprite3D;
+    public light: Laya.PointLight;
     public spotLight: Laya.SpotLight;
-    public light_height: number;
-    public start_pos: Array<number>;
+    public directionLight: Laya.DirectionLight;
+    //位置信息
+    public cube_pos_init: Laya.Vector3
     public cube1_pos: Laya.Vector3;
     public cube2_pos: Laya.Vector3;
     public center_pos: Laya.Vector3;
-    public lastMove: Direction;
-    public MAX_LENGTH: number;
-    public MAX_WIDTH: number;
 
+    //关卡常量
+    //地图
+    public map_info: Array<Array<number>>;
+    public MAX_LENGTH: number;  //上下
+    public MAX_WIDTH: number;   //左右
+    //灯光
+    public light_range: number;
+    public light_height: number;
+    public light_global_on: boolean;
+    //位置
+    public start_pos: Array<number>;
+    //资源url
+    public BLOCK_URL: string;
+    public BLOCK_IRON_URL: string;
+    public BLOCK_MUBAN_URL: string;
+    public CUBE_URL: string;
+
+    //状态量
+    public lastMove: Direction;
     //消息队列
     public messageQueue: Array<Operation>;
     public messageBusy: boolean;
 
     constructor (gate_file: string) {
-        //初始化引擎
-        //Laya3D.init(0, 0, true);
-
-        //适配模式
-        //Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-        //Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-
-        //开启统计信息
-        //Laya.Stat.show();
-
+        //构造函数
         //添加3D场景
         this.scene= Laya.stage.addChild(new Laya.Scene()) as Laya.Scene;
 
@@ -43,47 +54,60 @@ class GameView {
         camera.transform.translate(new Laya.Vector3(-5, 6, 20));
         camera.transform.rotate(new Laya.Vector3(-5, -30, 0), true, false);
         camera.clearColor = null;
-/*
-        //添加方向光
-        let directionLight: Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-        directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
-        directionLight.direction = new Laya.Vector3(1, -1, 0);
-*/
+
         //初始化类成员变量
         this.messageQueue = new Array<Operation>();
         this.messageBusy = false;
+        //调用loadView函数加载场景内容
         Laya.loader.load(gate_file, Laya.Handler.create(this, this.loadView, [gate_file]), null, Laya.Loader.JSON);
     }
-    loadView (gate_file: string) {
-        //一些常数
-        this.light_height = 3;
-        const block_depth: number = 0.1;
 
+    /**loadView加载场景内容相关函数 代码块开始 */
+    loadView (gate_file: string) {
         //读取关卡文件
         let json_info: JSON = Laya.Loader.getRes(gate_file);
-
         //初始化类成员变量
-        this.MAX_LENGTH = json_info["map_width"];
-        this.MAX_WIDTH = json_info["map_length"];
-        const BLOCK_URL: string = json_info["url_block"];
-        const BLOCK_IRON_URL: string = json_info["url_iron"];
-        const BLOCK_MUBAN_URL: string = json_info["url_muban"];
-        const CUBE_URL: string = json_info["url_cube"];
-        const material_block: Laya.StandardMaterial = new Laya.StandardMaterial();
-        material_block.diffuseTexture = Laya.Texture2D.load(BLOCK_URL);
-        const material_iron: Laya.StandardMaterial = new Laya.StandardMaterial();
-        material_iron.diffuseTexture = Laya.Texture2D.load(BLOCK_IRON_URL);
-        const material_muban: Laya.StandardMaterial = new Laya.StandardMaterial();
-        material_muban.diffuseTexture = Laya.Texture2D.load(BLOCK_MUBAN_URL);
-        this.map_info = json_info["map"];
-        this.map = new Array<Array<Laya.MeshSprite3D>>();
+        //灯光
         this.light_range = 3;
+        this.light_height = 3;
+        this.light_global_on = json_info["light_on"];
+        //资源url
+        this.BLOCK_URL = json_info["url_block"];
+        this.BLOCK_IRON_URL = json_info["url_iron"];
+        this.BLOCK_MUBAN_URL = json_info["url_muban"];
+        this.CUBE_URL = json_info["url_cube"];
+        //地图
+        this.map_info = json_info["map"];
+        this.MAX_LENGTH = json_info["map_length"];   //上下
+        this.MAX_WIDTH = json_info["map_width"];     //左右 
         this.start_pos = json_info["startpos"];
-        const cube_pos_init: Laya.Vector3 = new Laya.Vector3(this.start_pos[0], 0, this.start_pos[1]);
-        this.cube1_pos = new Laya.Vector3(cube_pos_init.x, cube_pos_init.y, cube_pos_init.z);
-        this.cube2_pos = new Laya.Vector3(cube_pos_init.x, cube_pos_init.y + 1, cube_pos_init.z);
+        //元素位置信息
+        this.cube_pos_init = new Laya.Vector3(this.start_pos[0], 0, this.start_pos[1]);
+        this.cube1_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y, this.cube_pos_init.z);
+        this.cube2_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y + 1, this.cube_pos_init.z);
 
+        //加入各元素
+        if(this.light_global_on){
+            this.loadDirectionLight();
+        }
+        this.loadMap();
+        this.loadCube();
+        this.loadSelfLight();
+        this.loadSpotLight();
+        this.updateLightPos();
+    }
+    loadMap () {
+        //一些常数
+        const block_depth: number = 0.1;        //地块厚度
+        //地块材质
+        const material_block: Laya.StandardMaterial = new Laya.StandardMaterial();
+        material_block.diffuseTexture = Laya.Texture2D.load(this.BLOCK_URL);
+        const material_iron: Laya.StandardMaterial = new Laya.StandardMaterial();
+        material_iron.diffuseTexture = Laya.Texture2D.load(this.BLOCK_IRON_URL);
+        const material_muban: Laya.StandardMaterial = new Laya.StandardMaterial();
+        material_muban.diffuseTexture = Laya.Texture2D.load(this.BLOCK_MUBAN_URL);
         //添加地形
+        this.map = new Array<Array<Laya.MeshSprite3D>>();
         for (let i = 0; i < this.MAX_WIDTH; i++) {
             this.map[i] = new Array<Laya.MeshSprite3D>();
             for (let j = 0; j < this.MAX_LENGTH; j++) {
@@ -136,30 +160,44 @@ class GameView {
                 }
             }
         }
-
+    }
+    loadCube () {
         //cube
-        this.cube = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 2))) as Laya.MeshSprite3D;
-        this.cube.transform.translate(cube_pos_init);                              //初始位置  
+        this.cube = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 2))) as Laya.MeshSprite3D; 
         let material_cube: Laya.StandardMaterial = new Laya.StandardMaterial();
-        material_cube.diffuseTexture = Laya.Texture2D.load(CUBE_URL);               //贴纸
+        material_cube.diffuseTexture = Laya.Texture2D.load(this.CUBE_URL);               //贴纸
         material_cube.albedo = new Laya.Vector4(6, 6, 6, 0.9);                      //透明效果
         material_cube.renderMode = Laya.StandardMaterial.RENDERMODE_DEPTHREAD_TRANSPARENTDOUBLEFACE;
         this.cube.meshRender.material = material_cube;
-
+        let fall_height = 10;
+        this.cube.transform.position = new Laya.Vector3(this.cube_pos_init.x, 
+                                                        fall_height, 
+                                                        this.cube_pos_init.z)                            //初始位置 
+        this.fall_in(fall_height);
+    }
+    loadSelfLight () {
         //自发光
         this.light = this.scene.addChild(new Laya.PointLight()) as Laya.PointLight;
-        this.light.transform.translate(cube_pos_init);
         this.light.range = this.light_range;
         this.light.attenuation = new Laya.Vector3(0.4, 0.4, 0.4);                   //衰减效果
-
+    }
+    loadSpotLight () {
         //范围聚光
         this.spotLight= this.scene.addChild(new Laya.SpotLight()) as Laya.SpotLight;
-        this.spotLight.transform.position = new Laya.Vector3(this.light.transform.position.x, this.light_height, this.light.transform.position.z);
         this.spotLight.direction = new Laya.Vector3(0, -1, 0);
         this.spotLight.range = 100;
         this.spotLight.spot = 12;
         this.spotLight.attenuation = new Laya.Vector3(0.01, 0.01, 0.01);
     }
+    loadDirectionLight () {
+        //添加方向光
+        this.directionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
+        this.directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
+        this.directionLight.direction = new Laya.Vector3(0, -1, 0);
+    }
+    /**loadView加载场景内容相关函数 代码块结束 */
+
+    /**cube动作相关接口函数 代码块开始 目前12个动作 */
     moveUp () {
         const up_pivot: Laya.Vector3 = new Laya.Vector3((this.cube1_pos.x + this.cube2_pos.x) / 2, -1, Math.min(this.cube1_pos.z, this.cube2_pos.z) - 0.5);
         this.lastMove = Direction.UP;
@@ -208,13 +246,16 @@ class GameView {
         this.moveAni(pivot, new Laya.Vector3(0, 0, -10), 9);
         this.fallAni(new Laya.Vector3(0, 0, -10), 9);       //异步的
     }
+    /**cube动作相关接口函数 代码块结束 */
+
+    /**cube动作接口函数调用的动画函数 代码块开始 */
     moveAni (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3, times: number) {
         //异步的
         let count = 0;
         let newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(() => {
-            this.myRotate(pivotVector, rotateVector);
+            this.doRotate(pivotVector, rotateVector);
             count++;
             if(count >= times){
                 //旋转90度调用回调函数
@@ -242,13 +283,13 @@ class GameView {
             }
         }, 1);
     }
-    fallStraightAni (times: number) {
+    fallStraightAni (rate: number, times: number) {
         //异步的
         let count = 0;
         let newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(() => {
-            this.cube.transform.position.y -= 0.2;
+            this.dofallStraight(rate);
             count++;
             if(count >= times){
                 clearInterval(newTimer);
@@ -259,9 +300,42 @@ class GameView {
             }
         }, 1);
     }
+    fallInAni (rate: number, times: number) {
+        //异步的
+        let count = 0;
+        let newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(() => {
+            this.dofallStraight(rate);
+            count++;
+            if(count >= times){
+                clearInterval(newTimer);
+            }
+        }, 1);
+    }
+    /**cube动作接口函数调用的动画函数 代码块结束 */
+
+    /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块开始 */
     doFall (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
         this.myRotate(pivotVector, rotateVector);
-        this.cube.transform.position.y -= 0.5;
+        this.myFallStraight(0.5);
+        this.updateLightPos();
+    }
+    doRotate (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
+        this.myRotate(pivotVector, rotateVector);
+        this.updateLightPos();
+    }
+    dofallStraight (rate: number) {
+        this.myFallStraight(rate);
+        this.updateLightPos();
+    }
+    /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块结束 */
+
+    /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块开始 */
+    myFallStraight (rate: number) {
+        this.cube.transform.position = new Laya.Vector3(this.cube.transform.position.x, 
+                                                        this.cube.transform.position.y - rate,
+                                                        this.cube.transform.position.z);
     }
     myRotate (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
         //Laya的旋转机制有毒 自己写了cube旋转函数 支持翻转
@@ -273,20 +347,22 @@ class GameView {
         //cube
         this.cube.transform.rotate(rotateVector, false, false);
         let oldposition_cube: Laya.Vector3 = new Laya.Vector3(this.cube.transform.position.x - pivotVector.x,
-                                        this.cube.transform.position.y - pivotVector.y, this.cube.transform.position.z - pivotVector.z);
+                                                            this.cube.transform.position.y - pivotVector.y, 
+                                                            this.cube.transform.position.z - pivotVector.z);
         let newposition_cube: Laya.Vector3 = new Laya.Vector3();
         Laya.Vector3.transformQuat(oldposition_cube, quaternion, newposition_cube);
         this.cube.transform.position = new Laya.Vector3(newposition_cube.x + pivotVector.x,
-                                        newposition_cube.y + pivotVector.y, newposition_cube.z + pivotVector.z);   
-        
-        this.updateLightPos();
+                                                        newposition_cube.y + pivotVector.y, 
+                                                        newposition_cube.z + pivotVector.z);   
     }
     updateLightPos () {
         //更新灯光位置
         //自发光
         this.light.transform.position = this.cube.transform.position;
         //视野聚光
-        this.spotLight.transform.position = new Laya.Vector3(this.light.transform.position.x, this.light_height, this.light.transform.position.z);
+        this.spotLight.transform.position = new Laya.Vector3(this.light.transform.position.x, 
+                                                            this.light_height, 
+                                                            this.light.transform.position.z);
     }
     updateCubePos () {
         //四舍五入修正坐标 尚未矫正偏角 不过实际效果偏角误差观察不出
@@ -313,6 +389,9 @@ class GameView {
             console.log("updateCubePos需要异常处理！");
         }
     }
+    /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块结束 */
+
+    /**对cube动作接口函数的逻辑运用 代码块开始 */
     fall_full (dir: Direction) {
         switch (dir) {
             case Direction.UP:
@@ -352,7 +431,10 @@ class GameView {
         }
     }
     fall_straight () {
-        this.fallStraightAni(9);
+        this.fallStraightAni(0.2, 9);
+    }
+    fall_in (height: number) {
+        this.fallInAni(1, height);
     }
     checkFall (): State {
         //普通掉落
@@ -392,6 +474,9 @@ class GameView {
         }
         return State.GAMING;
     }
+    /**对cube动作接口函数的逻辑运用 代码块结束 */
+
+    /**消息机制 代码块开始 */
     addMessage (operation: Operation) {
         this.messageQueue.push(operation);
         if (!this.messageBusy) {
@@ -425,24 +510,5 @@ class GameView {
             }
         }
     }
-
-    //test
-    myAnimation (fn_action) {
-        fn_action();
-        //异步的
-        let count = 0;
-        let newTimer = null;
-        clearInterval(newTimer);
-        newTimer = setInterval(() => {
-            count++;
-            if(1){
-                //旋转90度调用回调函数
-                clearInterval(newTimer);
-                this.updateCubePos();
-                
-                this.checkMessageQueue();
-                this.fallLeft();
-            }
-        }, 1);
-    }
+    /**消息机制 代码块结束 */
 }

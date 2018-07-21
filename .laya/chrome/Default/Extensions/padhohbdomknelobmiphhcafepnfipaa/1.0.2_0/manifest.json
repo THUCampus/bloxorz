@@ -1,0 +1,28 @@
+{
+   "author": "acgotaku",
+   "background": {
+      "persistent": false,
+      "scripts": [ "background.js" ]
+   },
+   "content_scripts": [ {
+      "css": [ "css/style.css" ],
+      "js": [ "js/start.js" ],
+      "matches": [ "*://pan.baidu.com/s/*", "*://yun.baidu.com/s/*", "*://pan.baidu.com/disk/home*", "*://yun.baidu.com/share/link*", "*://pan.baidu.com/share/link*", "*://yun.baidu.com/disk/home*", "*://pan.baidu.com/pcloud/album/*", "*://yun.baidu.com/pcloud/album/*" ],
+      "run_at": "document_idle"
+   } ],
+   "default_locale": "en",
+   "description": "__MSG_description__",
+   "icons": {
+      "128": "img/logo128.png",
+      "16": "img/logo16.png",
+      "32": "img/logo32.png",
+      "48": "img/logo48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlwXeYmi951FDTizYahnc8HI8XUxo/TcikTi9qCwws5bM5Gipc6mB0T194Oigj8qf2rN4g+tXrc+ht0vYvSUu4eoiB6ZHXSnZPL10LaFWx1E/Wu5NC0bDn1ZOa2lplecvAqUFzjhsEMpaO08rz6m3LP2JVsHGALzrj3DRi35+X6glS1ML/w8Wefg0SClnqfqSrbuyWcbtzHCyA6W9jGTCrxlP/Lkg7zCUeI1RuRtNvh6nhB2yGOzNOC+O25EvosOhlZxVaSbk6GoLP0rgYYnccCufruY1aqbY8Gs3raKX8YWNIs8tWF7LCU5yOKDAaaKqCFZPMZby1SEpQ15mIbXqGwIDAQAB",
+   "manifest_version": 2,
+   "name": "__MSG_appName__",
+   "permissions": [ "cookies", "notifications", "*://pan.baidu.com/", "*://yun.baidu.com/", "*://pcs.baidu.com/", "activeTab", "contextMenus", "storage" ],
+   "update_url": "https://raw.githubusercontent.com/acgotaku/BaiduExporter/master/chrome/updates.xml",
+   "version": "1.0.2",
+   "web_accessible_resources": [ "js/baidu.js" ]
+}
