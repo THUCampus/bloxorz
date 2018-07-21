@@ -59,7 +59,7 @@ class LayaAir3D {
         this.gameui.pausebutton.on(Laya.Event.MOUSE_DOWN,this,this.pause);
         Laya.stage.destroyChildren();
         Laya.stage.addChild(this.gameui);
-        this.currentGame = new GameView("res/map_1.json");
+        this.currentGame = new GameView("res/map_1.json", this);
         this.startTimer();
     }
     startTimer()

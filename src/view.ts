@@ -6,7 +6,11 @@ enum Operation{UP, DOWN, LEFT, RIGHT};
 enum Block{EMPTY, ORDINARY, IRON, MUBAN, LIGHT, HEAVY, FLASH, END};
 enum State{GAMING, SUCCESS, FAILURE};
 
+//计时器间隔
+const millisec: number = 10;
+
 class GameView {
+    public parent: LayaAir3D;
     //Laya3D场景内容
     //元素
     public scene: Laya.Scene;
@@ -40,11 +44,12 @@ class GameView {
 
     //状态量
     public lastMove: Direction;
+    public canOperate: boolean;
     //消息队列
     public messageQueue: Array<Operation>;
     public messageBusy: boolean;
 
-    constructor (gate_file: string) {
+    constructor (gate_file: string, parent: LayaAir3D) {
         //构造函数
         //添加3D场景
         this.scene= Laya.stage.addChild(new Laya.Scene()) as Laya.Scene;
@@ -56,8 +61,10 @@ class GameView {
         camera.clearColor = null;
 
         //初始化类成员变量
+        this.parent = parent;
         this.messageQueue = new Array<Operation>();
         this.messageBusy = false;
+        this.canOperate = false;
         //调用loadView函数加载场景内容
         Laya.loader.load(gate_file, Laya.Handler.create(this, this.loadView, [gate_file]), null, Laya.Loader.JSON);
     }
@@ -179,7 +186,7 @@ class GameView {
         //自发光
         this.light = this.scene.addChild(new Laya.PointLight()) as Laya.PointLight;
         this.light.range = this.light_range;
-        this.light.attenuation = new Laya.Vector3(0.4, 0.4, 0.4);                   //衰减效果
+        this.light.attenuation = new Laya.Vector3(1, 1, 1);                   //衰减效果
     }
     loadSpotLight () {
         //范围聚光
@@ -192,7 +199,7 @@ class GameView {
     loadDirectionLight () {
         //添加方向光
         this.directionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-        this.directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
+        this.directionLight.color = new Laya.Vector3(0.5, 0.5, 0.5);
         this.directionLight.direction = new Laya.Vector3(0, -1, 0);
     }
     /**loadView加载场景内容相关函数 代码块结束 */
@@ -219,32 +226,28 @@ class GameView {
         this.moveAni(right_pivot, new Laya.Vector3(0, 0, -10), 9);       //异步的
     }
     fallUp () {
-        this.fallAni(new Laya.Vector3(-10, 0, 0), 9);       //异步的
+        this.fallAni(new Laya.Vector3(-10, 0, 0), 27);       //异步的
     }
     fallDown () {
-        this.fallAni(new Laya.Vector3(10, 0, 0), 9);       //异步的
+        this.fallAni(new Laya.Vector3(10, 0, 0), 27);       //异步的
     }
     fallLeft () {
-        this.fallAni(new Laya.Vector3(0, 0, 10), 9);       //异步的
+        this.fallAni(new Laya.Vector3(0, 0, 10), 27);       //异步的
     }
     fallRight () {
-        this.fallAni(new Laya.Vector3(0, 0, -10), 9);       //异步的
+        this.fallAni(new Laya.Vector3(0, 0, -10), 27);       //异步的
     }
     fallUp_half (pivot: Laya.Vector3) {
-        this.moveAni(pivot, new Laya.Vector3(-10, 0, 0), 9);
-        this.fallAni(new Laya.Vector3(-10, 0, 0), 9);       //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(-10, 0, 0), 9);
     }
     fallDown_half (pivot: Laya.Vector3) {
-        this.moveAni(pivot, new Laya.Vector3(10, 0, 0), 9);
-        this.fallAni(new Laya.Vector3(10, 0, 0), 9);       //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(10, 0, 0), 9);
     }
     fallLeft_half (pivot: Laya.Vector3) {
-        this.moveAni(pivot, new Laya.Vector3(0, 0, 10), 9);
-        this.fallAni(new Laya.Vector3(0, 0, 10), 9);       //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(0, 0, 10), 9);
     }
     fallRight_half (pivot: Laya.Vector3) {
-        this.moveAni(pivot, new Laya.Vector3(0, 0, -10), 9);
-        this.fallAni(new Laya.Vector3(0, 0, -10), 9);       //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(0, 0, -10), 9);
     }
     /**cube动作相关接口函数 代码块结束 */
 
@@ -261,11 +264,9 @@ class GameView {
                 //旋转90度调用回调函数
                 clearInterval(newTimer);
                 this.updateCubePos();
-                if (this.checkFall() === State.GAMING) {
-                    this.checkMessageQueue();
-                }
+                this.checkState();
             }
-        }, 1);
+        }, millisec);
     }
     fallAni (rotateVector: Laya.Vector3, times: number) {
         //异步的
@@ -277,28 +278,59 @@ class GameView {
             count++;
             if(count >= times){
                 clearInterval(newTimer);
-                this.updateCubePos();
                 //游戏失败的处理
                 console.log("fail");
+                this.restart();
             }
-        }, 1);
+        }, millisec);
     }
-    fallStraightAni (rate: number, times: number) {
+    fallHalfAni (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3, times: number) {
         //异步的
         let count = 0;
         let newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(() => {
-            this.dofallStraight(rate);
+            this.doRotate(pivotVector, rotateVector);
+            count++;
+            if(count >= times){
+                //旋转90度调用回调函数
+                clearInterval(newTimer);
+                this.updateCubePos();
+                this.fallAni(rotateVector, 27);       //异步的
+            }
+        }, millisec);
+    }
+    fallStraightWinAni (rate: number, times: number) {
+        //异步的
+        let count = 0;
+        let newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(() => {
+            this.doFallStraight(rate);
             count++;
             if(count >= times){
                 clearInterval(newTimer);
-                this.updateCubePos();
                 //游戏胜利的处理
                 console.log("success");
-                //advance 红木时游戏失败的处理
+                this.goToNext();
             }
-        }, 1);
+        }, millisec);
+    }
+    fallStraightLoseAni (rate: number, times: number) {
+        //异步的
+        let count = 0;
+        let newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(() => {
+            this.doFallStraight(rate);
+            count++;
+            if(count >= times){
+                clearInterval(newTimer);
+                //红木掉落的处理
+                console.log("red");
+                this.restart();
+            }
+        }, millisec);
     }
     fallInAni (rate: number, times: number) {
         //异步的
@@ -306,12 +338,27 @@ class GameView {
         let newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(() => {
-            this.dofallStraight(rate);
+            this.doFallStraight(rate);
             count++;
             if(count >= times){
                 clearInterval(newTimer);
+                this.canOperate = true;
             }
-        }, 1);
+        }, millisec);
+    }
+    restartAni (times: number) {
+        //异步的
+        let count = 0;
+        let newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(() => {
+            this.doDark();
+            count++;
+            if(count >= times){
+                clearInterval(newTimer);
+                this.parent.restart();
+            }
+        }, millisec);
     }
     /**cube动作接口函数调用的动画函数 代码块结束 */
 
@@ -325,9 +372,19 @@ class GameView {
         this.myRotate(pivotVector, rotateVector);
         this.updateLightPos();
     }
-    dofallStraight (rate: number) {
+    doFallStraight (rate: number) {
         this.myFallStraight(rate);
         this.updateLightPos();
+    }
+    doDark () {
+        this.spotLight.attenuation = new Laya.Vector3(this.spotLight.attenuation.x,
+                                                    this.spotLight.attenuation.y + 0.03,
+                                                    this.spotLight.attenuation.z);
+        if (this.light_global_on) {
+            this.directionLight.color = new Laya.Vector3(this.directionLight.color.x - 0.05,
+                                                        this.directionLight.color.y - 0.05,
+                                                        this.directionLight.color.z - 0.05)
+        }
     }
     /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块结束 */
 
@@ -391,8 +448,9 @@ class GameView {
     }
     /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块结束 */
 
-    /**对cube动作接口函数的逻辑运用 代码块开始 */
+    /**cube动作接口函数所需的逻辑 代码块开始 */
     fall_full (dir: Direction) {
+        this.canOperate = false;
         switch (dir) {
             case Direction.UP:
             this.fallUp();
@@ -413,6 +471,7 @@ class GameView {
         }
     }
     fall_half (pos_empty: Laya.Vector3, pos_safe: Laya.Vector3) {
+        this.canOperate = false;
         if (pos_empty.x > pos_safe.x) {
             let pivot: Laya.Vector3 = new Laya.Vector3(pos_empty.x - 0.5, -1, pos_empty.z);
             this.fallRight_half(pivot);
@@ -430,8 +489,9 @@ class GameView {
             console.log("fall_half需要异常处理！");
         }
     }
-    fall_straight () {
-        this.fallStraightAni(0.2, 9);
+    fall_straight_win () {
+        this.canOperate = false;
+        this.fallStraightWinAni(0.2, 9);
     }
     fall_in (height: number) {
         this.fallInAni(1, height);
@@ -469,15 +529,39 @@ class GameView {
         let win_1: boolean = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.END);
         let win_2: boolean = (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.END);
         if(win_1 === true && win_2 === true){
-            this.fall_straight();
+            this.fall_straight_win();
             return State.SUCCESS;
         }
         return State.GAMING;
     }
-    /**对cube动作接口函数的逻辑运用 代码块结束 */
+    checkState () {
+        //检查游戏状态 判断是否应该重新开始 或者进行下一关
+        let currentState: State = this.checkFall();
+        if (currentState === State.FAILURE) {
+            //啥也不用干 因为会在掉落动画结束后处理 搜索 
+            return;
+        } else if(currentState === State.SUCCESS) {
+            //啥也不用干 因为会在掉落动画结束后处理
+            return;
+        } else if (currentState === State.GAMING) {
+            //维持消息机制
+            this.checkMessageQueue();
+        }
+
+    }
+    restart () {
+        this.restartAni(30);
+    }
+    goToNext () {
+
+    }
+    /**cube动作接口函数所需的逻辑 代码块结束 */
 
     /**消息机制 代码块开始 */
     addMessage (operation: Operation) {
+        if (!this.canOperate) {
+            return;
+        }
         this.messageQueue.push(operation);
         if (!this.messageBusy) {
             this.messageBusy = true;
@@ -485,6 +569,9 @@ class GameView {
         }
     }
     checkMessageQueue () {
+        if (!this.canOperate) {
+            return;
+        }
         if (this.messageQueue.length === 0) {
             this.messageBusy = false;
             return;

@@ -35,8 +35,10 @@ var State;
     State[State["FAILURE"] = 2] = "FAILURE";
 })(State || (State = {}));
 ;
+//计时器间隔
+var millisec = 10;
 var GameView = /** @class */ (function () {
-    function GameView(gate_file) {
+    function GameView(gate_file, parent) {
         //构造函数
         //添加3D场景
         this.scene = Laya.stage.addChild(new Laya.Scene());
@@ -46,8 +48,10 @@ var GameView = /** @class */ (function () {
         camera.transform.rotate(new Laya.Vector3(-5, -30, 0), true, false);
         camera.clearColor = null;
         //初始化类成员变量
+        this.parent = parent;
         this.messageQueue = new Array();
         this.messageBusy = false;
+        this.canOperate = false;
         //调用loadView函数加载场景内容
         Laya.loader.load(gate_file, Laya.Handler.create(this, this.loadView, [gate_file]), null, Laya.Loader.JSON);
     }
@@ -164,7 +168,7 @@ var GameView = /** @class */ (function () {
         //自发光
         this.light = this.scene.addChild(new Laya.PointLight());
         this.light.range = this.light_range;
-        this.light.attenuation = new Laya.Vector3(0.4, 0.4, 0.4); //衰减效果
+        this.light.attenuation = new Laya.Vector3(1, 1, 1); //衰减效果
     };
     GameView.prototype.loadSpotLight = function () {
         //范围聚光
@@ -177,7 +181,7 @@ var GameView = /** @class */ (function () {
     GameView.prototype.loadDirectionLight = function () {
         //添加方向光
         this.directionLight = this.scene.addChild(new Laya.DirectionLight());
-        this.directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
+        this.directionLight.color = new Laya.Vector3(0.5, 0.5, 0.5);
         this.directionLight.direction = new Laya.Vector3(0, -1, 0);
     };
     /**loadView加载场景内容相关函数 代码块结束 */
@@ -203,32 +207,28 @@ var GameView = /** @class */ (function () {
         this.moveAni(right_pivot, new Laya.Vector3(0, 0, -10), 9); //异步的
     };
     GameView.prototype.fallUp = function () {
-        this.fallAni(new Laya.Vector3(-10, 0, 0), 9); //异步的
+        this.fallAni(new Laya.Vector3(-10, 0, 0), 27); //异步的
     };
     GameView.prototype.fallDown = function () {
-        this.fallAni(new Laya.Vector3(10, 0, 0), 9); //异步的
+        this.fallAni(new Laya.Vector3(10, 0, 0), 27); //异步的
     };
     GameView.prototype.fallLeft = function () {
-        this.fallAni(new Laya.Vector3(0, 0, 10), 9); //异步的
+        this.fallAni(new Laya.Vector3(0, 0, 10), 27); //异步的
     };
     GameView.prototype.fallRight = function () {
-        this.fallAni(new Laya.Vector3(0, 0, -10), 9); //异步的
+        this.fallAni(new Laya.Vector3(0, 0, -10), 27); //异步的
     };
     GameView.prototype.fallUp_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(-10, 0, 0), 9);
-        this.fallAni(new Laya.Vector3(-10, 0, 0), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(-10, 0, 0), 9);
     };
     GameView.prototype.fallDown_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(10, 0, 0), 9);
-        this.fallAni(new Laya.Vector3(10, 0, 0), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(10, 0, 0), 9);
     };
     GameView.prototype.fallLeft_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(0, 0, 10), 9);
-        this.fallAni(new Laya.Vector3(0, 0, 10), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(0, 0, 10), 9);
     };
     GameView.prototype.fallRight_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(0, 0, -10), 9);
-        this.fallAni(new Laya.Vector3(0, 0, -10), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(0, 0, -10), 9);
     };
     /**cube动作相关接口函数 代码块结束 */
     /**cube动作接口函数调用的动画函数 代码块开始 */
@@ -245,11 +245,9 @@ var GameView = /** @class */ (function () {
                 //旋转90度调用回调函数
                 clearInterval(newTimer);
                 _this.updateCubePos();
-                if (_this.checkFall() === State.GAMING) {
-                    _this.checkMessageQueue();
-                }
+                _this.checkState();
             }
-        }, 1);
+        }, millisec);
     };
     GameView.prototype.fallAni = function (rotateVector, times) {
         var _this = this;
@@ -262,29 +260,62 @@ var GameView = /** @class */ (function () {
             count++;
             if (count >= times) {
                 clearInterval(newTimer);
-                _this.updateCubePos();
                 //游戏失败的处理
                 console.log("fail");
+                _this.restart();
             }
-        }, 1);
+        }, millisec);
     };
-    GameView.prototype.fallStraightAni = function (rate, times) {
+    GameView.prototype.fallHalfAni = function (pivotVector, rotateVector, times) {
         var _this = this;
         //异步的
         var count = 0;
         var newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(function () {
-            _this.dofallStraight(rate);
+            _this.doRotate(pivotVector, rotateVector);
+            count++;
+            if (count >= times) {
+                //旋转90度调用回调函数
+                clearInterval(newTimer);
+                _this.updateCubePos();
+                _this.fallAni(rotateVector, 27); //异步的
+            }
+        }, millisec);
+    };
+    GameView.prototype.fallStraightWinAni = function (rate, times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doFallStraight(rate);
             count++;
             if (count >= times) {
                 clearInterval(newTimer);
-                _this.updateCubePos();
                 //游戏胜利的处理
                 console.log("success");
-                //advance 红木时游戏失败的处理
+                _this.goToNext();
             }
-        }, 1);
+        }, millisec);
+    };
+    GameView.prototype.fallStraightLoseAni = function (rate, times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doFallStraight(rate);
+            count++;
+            if (count >= times) {
+                clearInterval(newTimer);
+                //红木掉落的处理
+                console.log("red");
+                _this.restart();
+            }
+        }, millisec);
     };
     GameView.prototype.fallInAni = function (rate, times) {
         var _this = this;
@@ -293,12 +324,28 @@ var GameView = /** @class */ (function () {
         var newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(function () {
-            _this.dofallStraight(rate);
+            _this.doFallStraight(rate);
             count++;
             if (count >= times) {
                 clearInterval(newTimer);
+                _this.canOperate = true;
             }
-        }, 1);
+        }, millisec);
+    };
+    GameView.prototype.restartAni = function (times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doDark();
+            count++;
+            if (count >= times) {
+                clearInterval(newTimer);
+                _this.parent.restart();
+            }
+        }, millisec);
     };
     /**cube动作接口函数调用的动画函数 代码块结束 */
     /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块开始 */
@@ -311,9 +358,15 @@ var GameView = /** @class */ (function () {
         this.myRotate(pivotVector, rotateVector);
         this.updateLightPos();
     };
-    GameView.prototype.dofallStraight = function (rate) {
+    GameView.prototype.doFallStraight = function (rate) {
         this.myFallStraight(rate);
         this.updateLightPos();
+    };
+    GameView.prototype.doDark = function () {
+        this.spotLight.attenuation = new Laya.Vector3(this.spotLight.attenuation.x, this.spotLight.attenuation.y + 0.03, this.spotLight.attenuation.z);
+        if (this.light_global_on) {
+            this.directionLight.color = new Laya.Vector3(this.directionLight.color.x - 0.05, this.directionLight.color.y - 0.05, this.directionLight.color.z - 0.05);
+        }
     };
     /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块结束 */
     /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块开始 */
@@ -368,8 +421,9 @@ var GameView = /** @class */ (function () {
         }
     };
     /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块结束 */
-    /**对cube动作接口函数的逻辑运用 代码块开始 */
+    /**cube动作接口函数所需的逻辑 代码块开始 */
     GameView.prototype.fall_full = function (dir) {
+        this.canOperate = false;
         switch (dir) {
             case Direction.UP:
                 this.fallUp();
@@ -390,6 +444,7 @@ var GameView = /** @class */ (function () {
         }
     };
     GameView.prototype.fall_half = function (pos_empty, pos_safe) {
+        this.canOperate = false;
         if (pos_empty.x > pos_safe.x) {
             var pivot = new Laya.Vector3(pos_empty.x - 0.5, -1, pos_empty.z);
             this.fallRight_half(pivot);
@@ -411,8 +466,9 @@ var GameView = /** @class */ (function () {
             console.log("fall_half需要异常处理！");
         }
     };
-    GameView.prototype.fall_straight = function () {
-        this.fallStraightAni(0.2, 9);
+    GameView.prototype.fall_straight_win = function () {
+        this.canOperate = false;
+        this.fallStraightWinAni(0.2, 9);
     };
     GameView.prototype.fall_in = function (height) {
         this.fallInAni(1, height);
@@ -452,14 +508,38 @@ var GameView = /** @class */ (function () {
         var win_1 = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.END);
         var win_2 = (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.END);
         if (win_1 === true && win_2 === true) {
-            this.fall_straight();
+            this.fall_straight_win();
             return State.SUCCESS;
         }
         return State.GAMING;
     };
-    /**对cube动作接口函数的逻辑运用 代码块结束 */
+    GameView.prototype.checkState = function () {
+        //检查游戏状态 判断是否应该重新开始 或者进行下一关
+        var currentState = this.checkFall();
+        if (currentState === State.FAILURE) {
+            //啥也不用干 因为会在掉落动画结束后处理 搜索 
+            return;
+        }
+        else if (currentState === State.SUCCESS) {
+            //啥也不用干 因为会在掉落动画结束后处理
+            return;
+        }
+        else if (currentState === State.GAMING) {
+            //维持消息机制
+            this.checkMessageQueue();
+        }
+    };
+    GameView.prototype.restart = function () {
+        this.restartAni(30);
+    };
+    GameView.prototype.goToNext = function () {
+    };
+    /**cube动作接口函数所需的逻辑 代码块结束 */
     /**消息机制 代码块开始 */
     GameView.prototype.addMessage = function (operation) {
+        if (!this.canOperate) {
+            return;
+        }
         this.messageQueue.push(operation);
         if (!this.messageBusy) {
             this.messageBusy = true;
@@ -467,6 +547,9 @@ var GameView = /** @class */ (function () {
         }
     };
     GameView.prototype.checkMessageQueue = function () {
+        if (!this.canOperate) {
+            return;
+        }
         if (this.messageQueue.length === 0) {
             this.messageBusy = false;
             return;
