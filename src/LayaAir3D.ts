@@ -60,6 +60,14 @@ class LayaAir3D {
         Laya.stage.destroyChildren();
         Laya.stage.addChild(this.gameui);
         this.currentGame = new GameView("res/map_0.json");
+        this.startTimer();
+    }
+    startTimer()
+    {
+        Laya.timer.loop(1000,this,function(){
+            this.gamelogic.timecount++;
+            this.gameui.time.text = "游戏用时: " + this.gamelogic.timecount + "s";
+        });
     }
     move(direction: Operation)
     {
@@ -73,12 +81,14 @@ class LayaAir3D {
                 console.log("win!");
                 break;
         }
+        this.gameui.step.text = "移动步数: " + this.gamelogic.stepcount;
     }
     pause()
     {
+        Laya.timer.clearAll(this);
         this.pauseui = new ui.pauseUI();
         this.pauseui.backToMain.on(Laya.Event.MOUSE_DOWN,this,this.backtomain);
-        this.pauseui.backToGame.on(Laya.Event.MOUSE_DOWN,this,function(){this.pauseui.close(); this.gameui.disabled = false;});
+        this.pauseui.backToGame.on(Laya.Event.MOUSE_DOWN,this,function(){this.pauseui.close(); this.gameui.disabled = false; this.startTimer();});
         this.pauseui.restart.on(Laya.Event.MOUSE_DOWN,this,this.restart);
         this.gameui.disabled = true;
         Laya.stage.addChild(this.pauseui);
@@ -87,6 +97,7 @@ class LayaAir3D {
     {
         //this.pauseui.close();
         Laya.stage.destroyChildren();
+        Laya.timer.clearAll(this);
         Laya.loader.clearRes("res/" + this.currentLevel + ".json");
         Laya.loader.load("res/" + this.currentLevel + ".json", Laya.Handler.create(this,this.loadgame), null, Laya.Loader.JSON);
     }
@@ -94,6 +105,7 @@ class LayaAir3D {
     {
         this.pauseui.close();
         Laya.stage.destroyChildren();
+        Laya.timer.clearAll(this);
         Laya.loader.clearRes("res/" + this.currentLevel + ".json");
         this.loadui();
     }

@@ -2,7 +2,7 @@
     "x":0,
     "type":"Dialog",
     "selectedBox":1,
-    "selecteID":1,
+    "selecteID":2,
     "props":{"width":400,"sceneColor":"#000000","popupCenter":true,"height":400,"centerY":0,"centerX":0},
     "nodeParent":-1,
     "label":"Dialog",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"TextArea",
-            "props":{"width":210,"text":"游戏暂停","height":57,"fontSize":50,"font":"SimHei","color":"#ffffff","centerY":-100,"centerX":0},
+            "props":{"width":210,"text":"游戏暂停","height":57,"fontSize":50,"font":"SimHei","editable":false,"color":"#ffffff","centerY":-100,"centerX":0},
             "nodeParent":1,
             "label":"TextArea",
             "isDirectory":false,

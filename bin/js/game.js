@@ -117,8 +117,11 @@ var game = /** @class */ (function () {
         this.pos = this.file["startpos"];
         this.triggers = this.file["triggers"];
         this.blockVertical = true;
+        this.stepcount = 0;
+        this.timecount = 0;
     }
     game.prototype.move = function (direction) {
+        this.stepcount++;
         switch (direction) {
             case Operation.UP:
                 this.moveup.apply(null);

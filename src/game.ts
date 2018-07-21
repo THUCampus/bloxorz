@@ -4,9 +4,11 @@ class game{
     private filename: string;
     private map: Array<any>;
     private size: number[];
-    public pos: Array<Array<number>>;
+    private pos: Array<Array<number>>;
     private triggers: Array<any>;
     private blockVertical: Boolean;
+    public stepcount: number;
+    public timecount: number;
     constructor(fileName: string)
     { 
         this.filename = fileName;
@@ -16,9 +18,12 @@ class game{
         this.pos = this.file["startpos"];
         this.triggers = this.file["triggers"];
         this.blockVertical = true;
+        this.stepcount = 0;
+        this.timecount = 0;
     }
     public move(direction: Operation)
     {
+        this.stepcount++;
         switch(direction)
         {
             case Operation.UP:
