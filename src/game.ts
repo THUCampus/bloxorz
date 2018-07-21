@@ -1,4 +1,3 @@
-const enum mapBlockType{empty, normal, red, oButton, xButton, end, metal};
 class game{
     private file: Object;
     private filename: string;
@@ -12,10 +11,10 @@ class game{
     constructor(fileName: string)
     { 
         this.filename = fileName;
-        this.file = Laya.loader.getRes("res/" + this.filename + ".json");
+        this.file = Laya.loader.getRes("res/map_" + this.filename + ".json");
         this.map = this.file["map"];
-        this.size = [this.map[0].length, this.map.length];
-        this.pos = this.file["startpos"];
+        this.size = [this.file["map_length"],this.file["map_width"]];
+        this.pos = [this.file["startpos"],[this.file["startpos"][0]+1,this.file["startpos"][1]+1]];
         this.triggers = this.file["triggers"];
         this.blockVertical = true;
         this.stepcount = 0;
@@ -47,10 +46,10 @@ class game{
         while(!(this.triggers[i].pos[0] === posx && this.triggers[i].pos[1] === posy))
             i++;
         for (let block in this.triggers[i].blocks) {
-            if(this.map[block[1]][block[0]] === 0)
-                this.map[block[1]][block[0]] = mapBlockType.metal;
-            else if(this.map[block[1]][block[0]] === mapBlockType.metal)
-                this.map[block[1]][block[0]] = 0;
+            if(this.map[block[1]][block[0]] === Block.IRON)
+                this.map[block[1]][block[0]] = Block.EMPTY;
+            else if(this.map[block[1]][block[0]] === Block.EMPTY)
+                this.map[block[1]][block[0]] = Block.IRON;
         }
     }
     update = () =>
@@ -58,19 +57,19 @@ class game{
         //lose
         if(this.pos[0][0] < 0 || this.pos[1][0] > this.size[0] || this.pos[0][1] < 0 || this.pos[1][1] > this.size[1])
             return State.FAILURE;
-        if(this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.empty || this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.red))
+        if(this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === Block.EMPTY || this.map[this.pos[0][1]][this.pos[0][0]] === Block.MUBAN))
             return State.FAILURE;
-        if(!this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.empty || this.map[this.pos[1][1]-1][this.pos[1][0]-1] === mapBlockType.empty))
+        if(!this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === Block.EMPTY || this.map[this.pos[1][1]-1][this.pos[1][0]-1] === Block.EMPTY))
             return State.FAILURE;
         //win
-        if(this.blockVertical && this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.end)
+        if(this.blockVertical && this.map[this.pos[0][1]][this.pos[0][0]] === Block.END)
             return State.SUCCESS;
         //trigger
-        if(this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.oButton || this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.xButton))
+        if(this.blockVertical && (this.map[this.pos[0][1]][this.pos[0][0]] === Block.LIGHT || this.map[this.pos[0][1]][this.pos[0][0]] === Block.HEAVY))
             this.trigger.apply(this.pos[0][0], this.pos[0][1]);
-        if(!this.blockVertical && this.map[this.pos[0][1]][this.pos[0][0]] === mapBlockType.oButton)
+        if(!this.blockVertical && this.map[this.pos[0][1]][this.pos[0][0]] ===Block.LIGHT)
             this.trigger.apply(this.pos[0][0],this.pos[0][1]);
-        if(!this.blockVertical && this.map[this.pos[1][1]-1][this.pos[1][0]-1] === mapBlockType.oButton)
+        if(!this.blockVertical && this.map[this.pos[1][1]-1][this.pos[1][0]-1] === Block.LIGHT)
             this.trigger.apply(this.pos[1][0]-1,this.pos[1][1]-1);
         //continue
         return State.GAMING;

@@ -34,7 +34,7 @@ var LayaAir3D = /** @class */ (function () {
         this.selectui.closeButton.on(Laya.Event.MOUSE_DOWN, this, function () { this.startui.disabled = false; this.selectui.close(); });
         this.selectui.select.on(Laya.Event.MOUSE_DOWN, this, function () {
             this.currentLevel = this.selectui.level.selectedLabel;
-            Laya.loader.load("res/" + this.currentLevel + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON);
+            Laya.loader.load("res/map_" + this.currentLevel + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON);
         });
     };
     LayaAir3D.prototype.loadgame = function () {
@@ -47,7 +47,7 @@ var LayaAir3D = /** @class */ (function () {
         this.gameui.pausebutton.on(Laya.Event.MOUSE_DOWN, this, this.pause);
         Laya.stage.destroyChildren();
         Laya.stage.addChild(this.gameui);
-        this.currentGame = new GameView("res/map_0.json");
+        this.currentGame = new GameView("res/map_1.json");
         this.startTimer();
     };
     LayaAir3D.prototype.startTimer = function () {
@@ -81,14 +81,14 @@ var LayaAir3D = /** @class */ (function () {
         //this.pauseui.close();
         Laya.stage.destroyChildren();
         Laya.timer.clearAll(this);
-        Laya.loader.clearRes("res/" + this.currentLevel + ".json");
-        Laya.loader.load("res/" + this.currentLevel + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON);
+        Laya.loader.clearRes("res/map_" + this.currentLevel + ".json");
+        Laya.loader.load("res/map_" + this.currentLevel + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON);
     };
     LayaAir3D.prototype.backtomain = function () {
         this.pauseui.close();
         Laya.stage.destroyChildren();
         Laya.timer.clearAll(this);
-        Laya.loader.clearRes("res/" + this.currentLevel + ".json");
+        Laya.loader.clearRes("res/map_" + this.currentLevel + ".json");
         this.loadui();
     };
     return LayaAir3D;
