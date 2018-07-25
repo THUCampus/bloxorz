@@ -1,14 +1,16 @@
 // 程序入口
 class LayaAir3D {
-        public startui: ui.startUI;
-        public helpui: ui.helpUI;
-        public selectui: ui.selectUI;
-        public gameui: ui.gameUI;
-        public pauseui: ui.pauseUI;
+/*
+        public startui: ui.start_viewUI;
+        public helpui: ui.help_listUI;
+        public selectui: ui.select_viewUI;
+        public gameui: ui.game_viewUI;
+        public pauseui: ui.pause_dialogUI;
         public finishui: ui.finishUI;
         public gamelogic: game;
         public currentLevel: string;
         public currentGame: GameView;
+*/
     constructor() {
         //初始化微信小游戏
         Laya.MiniAdpter.init();
@@ -22,36 +24,54 @@ class LayaAir3D {
 
         //开启统计信息
         Laya.Stat.show();
-        let res: Array<any> = [{url:"arrow.png",type:Laya.Loader.IMAGE},{url:"pause.png",type:Laya.Loader.IMAGE},{url:"button.png",type:Laya.Loader.IMAGE},{url:"btn_close.png",type:Laya.Loader.IMAGE},{url:"combobox.png",type:Laya.Loader.IMAGE}];
+        let test = new MenuView();
+/*
+        let res: Array<any> = [{url:"arrow_large_1.png",type:Laya.Loader.IMAGE},
+                            {url:"arrow_large_2.png",type:Laya.Loader.IMAGE},
+                            {url:"arrow_large_3.png",type:Laya.Loader.IMAGE},
+                            {url:"arrow_large_4.png",type:Laya.Loader.IMAGE},
+                            {url:"pause.png",type:Laya.Loader.IMAGE},
+                            {url:"button.png",type:Laya.Loader.IMAGE},
+                            {url:"btn_close.png",type:Laya.Loader.IMAGE},
+                            {url:"combobox.png",type:Laya.Loader.IMAGE}];
         Laya.loader.load(res,Laya.Handler.create(this, this.loadui), null)
+*/
     }
+/*
     loadui()
     {
-        this.startui = new ui.startUI();
+        this.startui = new ui.start_viewUI();
+/*
         this.startui.startButton.on(Laya.Event.MOUSE_DOWN,this,this.selectlevel);
         this.startui.helpButton.on(Laya.Event.MOUSE_DOWN,this,this.help);
+
         Laya.stage.addChild(this.startui);
+    }
+    loadLogo () {
+
     }
     help()
     {
-        this.helpui = new ui.helpUI();
+        this.helpui = new ui.help_listUI();
         Laya.stage.addChild(this.helpui);
         this.startui.disabled = true;
         this.helpui.closeButton.on(Laya.Event.MOUSE_DOWN,this,function(){this.startui.disabled = false;this.helpui.close();})
     }
     selectlevel()
     {
-        this.selectui = new ui.selectUI();
+        this.selectui = new ui.select_viewUI();
         Laya.stage.addChild(this.selectui);
         this.startui.disabled = true;
+/*
         this.selectui.closeButton.on(Laya.Event.MOUSE_DOWN,this,function(){this.startui.disabled = false;this.selectui.close();});
         this.selectui.select.on(Laya.Event.MOUSE_DOWN,this,function(){this.currentLevel = this.selectui.level.selectedLabel;
             Laya.loader.load("res/map_" + this.currentLevel + ".json", Laya.Handler.create(this,this.loadgame), null, Laya.Loader.JSON);});
+
     }
     loadgame()
     {
         this.gamelogic = new game(this.currentLevel);
-        this.gameui = new ui.gameUI();
+        this.gameui = new ui.game_viewUI();
         this.gameui.upbutton.on(Laya.Event.MOUSE_DOWN,this,this.move,[Operation.UP]);
         this.gameui.downbutton.on(Laya.Event.MOUSE_DOWN,this,this.move,[Operation.DOWN]);
         this.gameui.leftbutton.on(Laya.Event.MOUSE_DOWN,this,this.move,[Operation.LEFT]);
@@ -86,7 +106,7 @@ class LayaAir3D {
     pause()
     {
         Laya.timer.clearAll(this);
-        this.pauseui = new ui.pauseUI();
+        this.pauseui = new ui.pause_dialogUI();
         this.pauseui.backToMain.on(Laya.Event.MOUSE_DOWN,this,this.backtomain);
         this.pauseui.backToGame.on(Laya.Event.MOUSE_DOWN,this,function(){this.pauseui.close(); this.gameui.disabled = false; this.startTimer();});
         this.pauseui.restart.on(Laya.Event.MOUSE_DOWN,this,this.restart);
@@ -110,6 +130,7 @@ class LayaAir3D {
         Laya.loader.clearRes("res/map_" + this.currentLevel + ".json");
         this.loadui();
     }
+*/
 }
 
 new LayaAir3D();

@@ -1,11 +1,16 @@
 D .
 R F95204C5 arrow.png
 R E4CDB50D arrow1.png
+R 55368808 arrow_large_1.png
+R 8D890108 arrow_large_2.png
+R F7057DBA arrow_large_3.png
+R 22FDA826 arrow_large_4.png
+R 6604FD56 background.jpg
 R B03390E5 btn_close.png
 R 1F3929EA button.png
 R A0E3B8F9 combobox.png
 R 4661683E logo.png
-R 950666E9 pause.png
+R BCAC0A4A pause.png
 D comp
 P D12221A9 bg.png
 P 9401CC40 blank.png
