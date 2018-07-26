@@ -3,11 +3,13 @@
 
 enum Direction{UP, DOWN, LEFT, RIGHT};
 enum Operation{UP, DOWN, LEFT, RIGHT};
-enum Block{EMPTY, ORDINARY, IRON, MUBAN, LIGHT, HEAVY, FLASH, END};
+enum Block{EMPTY, ORDINARY, IRON, MUBAN, LIGHT, HEAVY, SPLIT, END};
 enum State{GAMING, SUCCESS, FAILURE};
 
-//计时器间隔
-const millisec: number = 10;
+
+//一些常数
+const block_depth: number = 0.1;        //地块厚度
+const millisec: number = 10;            //计时器间隔
 
 class GameView {
     public parent: MenuView;
@@ -21,7 +23,6 @@ class GameView {
     public directionLight: Laya.DirectionLight;
     //位置信息
     public camera_pos: Laya.Vector3;
-    //public camera_rotate: Laya.Vector3;
     public cube_pos_init: Laya.Vector3
     public cube1_pos: Laya.Vector3;
     public cube2_pos: Laya.Vector3;
@@ -34,6 +35,8 @@ class GameView {
     public map_info: Array<Array<number>>;
     public MAX_LENGTH: number;  //上下
     public MAX_WIDTH: number;   //左右
+    //机关
+    public switch_info: Array<Object>;
     //灯光
     public light_range: number;
     public light_height: number;
@@ -45,6 +48,9 @@ class GameView {
     public BLOCK_IRON_URL: string;
     public BLOCK_MUBAN_URL: string;
     public CUBE_URL: string;
+    public BLOCK_SWITCH_LIGHT_URL: string;
+    public BLOCK_SWITCH_HEAVY_URL: string;
+    public BLOCK_SWITCH_SPLIT_URL: string;
 
     //状态量
     public lastMove: Direction;
@@ -71,6 +77,8 @@ class GameView {
         this.messageQueue = new Array<Operation>();
         this.messageBusy = false;
         this.canOperate = false;
+        this.parent.stepcount = 0;
+        this.parent.setMovesCount();
         //调用loadView函数加载场景内容
         let gate_file = this.indexToString(this.gate_index);
         let levels_file = 'res/levels.json';
@@ -94,9 +102,6 @@ class GameView {
         this.camera_pos = new Laya.Vector3(json_info["camera_pos"][0], 
                                         json_info["camera_pos"][1], 
                                         json_info["camera_pos"][2]);
-        //this.camera_rotate = new Laya.Vector3(json_info["camera_rotate"][0], 
-          //                              json_info["camera_rotate"][1], 
-            //                            json_info["camera_rotate"][2]);
         //灯光
         this.light_range = 3;
         this.light_height = 3;
@@ -106,11 +111,16 @@ class GameView {
         this.BLOCK_IRON_URL = json_info["url_iron"];
         this.BLOCK_MUBAN_URL = json_info["url_muban"];
         this.CUBE_URL = json_info["url_cube"];
+        this.BLOCK_SWITCH_LIGHT_URL = json_info["url_switch_light"];
+        this.BLOCK_SWITCH_HEAVY_URL = json_info["url_switch_heavy"];
+        this.BLOCK_SWITCH_SPLIT_URL = json_info["url_switch_split"];
         //地图
         this.map_info = json_info["map"];
         this.MAX_LENGTH = json_info["map_length"];   //上下
         this.MAX_WIDTH = json_info["map_width"];     //左右 
         this.start_pos = json_info["startpos"];
+        //机关
+        this.switch_info = json_info["triggers"];
         //元素位置信息
         this.cube_pos_init = new Laya.Vector3(this.start_pos[1], 0, this.start_pos[0]);
         this.cube1_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y, this.cube_pos_init.z);
@@ -176,8 +186,6 @@ class GameView {
         camera.orthographic = true;
     }
     loadMap () {
-        //一些常数
-        const block_depth: number = 0.1;        //地块厚度
         //地块材质
         const material_block: Laya.StandardMaterial = new Laya.StandardMaterial();
         material_block.diffuseTexture = Laya.Texture2D.load(this.BLOCK_URL);
@@ -185,6 +193,12 @@ class GameView {
         material_iron.diffuseTexture = Laya.Texture2D.load(this.BLOCK_IRON_URL);
         const material_muban: Laya.StandardMaterial = new Laya.StandardMaterial();
         material_muban.diffuseTexture = Laya.Texture2D.load(this.BLOCK_MUBAN_URL);
+        const material_switch_light: Laya.StandardMaterial = new Laya.StandardMaterial();
+        material_switch_light.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_LIGHT_URL);
+        const material_switch_heavy: Laya.StandardMaterial = new Laya.StandardMaterial();
+        material_switch_heavy.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_HEAVY_URL);
+        const material_switch_split: Laya.StandardMaterial = new Laya.StandardMaterial();
+        material_switch_split.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_SPLIT_URL);
         //添加地形
         this.map = new Array<Array<Laya.MeshSprite3D>>();
         for (let i = 0; i < this.MAX_WIDTH; i++) {
@@ -197,38 +211,38 @@ class GameView {
                     case Block.ORDINARY:
                     //普通地块
                     this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, block_depth))) as Laya.MeshSprite3D;
-                    this.map[i][j].transform.translate(new Laya.Vector3(i, -1-block_depth/2, j), true);
+                    this.map[i][j].transform.position = new Laya.Vector3(i, -1-block_depth/2, j);
                     this.map[i][j].meshRender.material = material_block;
                     break;
                     case Block.IRON:
                     //机关地块
                     this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1))) as Laya.MeshSprite3D;
-                    this.map[i][j].transform.translate(new Laya.Vector3(i, -1-block_depth/2, j), true);
+                    this.map[i][j].transform.position = new Laya.Vector3(i, -1-block_depth/2, j);
                     this.map[i][j].meshRender.material = material_iron;
                     break;
                     case Block.MUBAN:
                     //木地块
                     this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1))) as Laya.MeshSprite3D;
-                    this.map[i][j].transform.translate(new Laya.Vector3(i, -1-block_depth/2, j), true);
+                    this.map[i][j].transform.position = new Laya.Vector3(i, -1-block_depth/2, j);
                     this.map[i][j].meshRender.material = material_muban;
                     break;
                     case Block.LIGHT:
                     //轻压机关
                     this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1))) as Laya.MeshSprite3D;
-                    this.map[i][j].transform.translate(new Laya.Vector3(i, -1-block_depth/2, j), true);
-                    this.map[i][j].meshRender.material = material_block;
+                    this.map[i][j].transform.position = new Laya.Vector3(i, -1-block_depth/2, j);
+                    this.map[i][j].meshRender.material = material_switch_light;
                     break;
                     case Block.HEAVY:
                     //重压机关
                     this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1))) as Laya.MeshSprite3D;
-                    this.map[i][j].transform.translate(new Laya.Vector3(i, -1-block_depth/2, j), true);
-                    this.map[i][j].meshRender.material = material_block;
+                    this.map[i][j].transform.position = new Laya.Vector3(i, -1-block_depth/2, j);
+                    this.map[i][j].meshRender.material = material_switch_heavy;
                     break;
-                    case Block.FLASH:
+                    case Block.SPLIT:
                     //分身机关
                     this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1))) as Laya.MeshSprite3D;
-                    this.map[i][j].transform.translate(new Laya.Vector3(i, -1-block_depth/2, j), true);
-                    this.map[i][j].meshRender.material = material_block;
+                    this.map[i][j].transform.position = new Laya.Vector3(i, -1-block_depth/2, j);
+                    this.map[i][j].meshRender.material = material_switch_split;
                     break;
                     case Block.END:
                     //终点
@@ -239,6 +253,7 @@ class GameView {
                 }
             }
         }
+        this.setTriggers();
     }
     loadCube () {
         //cube
@@ -392,13 +407,14 @@ class GameView {
             }
         }, millisec);
     }
-    fallStraightLoseAni (rate: number, times: number) {
+    fallStraightLoseAni (block: Laya.MeshSprite3D, rate: number, times: number) {
         //异步的
         let count = 0;
         let newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(() => {
             this.doFallStraight(rate);
+            this.doFallBlock(block, rate + 0.1);
             count++;
             if(count >= times){
                 clearInterval(newTimer);
@@ -440,17 +456,20 @@ class GameView {
 
     /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块开始 */
     doFall (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
-        this.myRotate(pivotVector, rotateVector);
-        this.myFallStraight(0.5);
+        this.myRotate(this.cube, pivotVector, rotateVector);
+        this.myFallStraight(this.cube, 0.5);
         this.updateLightPos();
     }
     doRotate (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
-        this.myRotate(pivotVector, rotateVector);
+        this.myRotate(this.cube, pivotVector, rotateVector);
         this.updateLightPos();
     }
     doFallStraight (rate: number) {
-        this.myFallStraight(rate);
+        this.myFallStraight(this.cube, rate);
         this.updateLightPos();
+    }
+    doFallBlock (block: Laya.MeshSprite3D, rate: number) {
+        this.myFallStraight(block, rate);
     }
     doDark () {
         if (!this.light_global_on) {
@@ -467,12 +486,12 @@ class GameView {
     /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块结束 */
 
     /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块开始 */
-    myFallStraight (rate: number) {
-        this.cube.transform.position = new Laya.Vector3(this.cube.transform.position.x, 
-                                                        this.cube.transform.position.y - rate,
-                                                        this.cube.transform.position.z);
+    myFallStraight (item: Laya.MeshSprite3D, rate: number) {
+        item.transform.position = new Laya.Vector3(item.transform.position.x, 
+                                                        item.transform.position.y - rate,
+                                                        item.transform.position.z);
     }
-    myRotate (pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
+    myRotate (item: Laya.MeshSprite3D, pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
         //Laya的旋转机制有毒 自己写了cube旋转函数 支持翻转
         //pivotVector 是旋转轴
         //rotateVector 是旋转方向及角度
@@ -480,15 +499,15 @@ class GameView {
         Laya.Quaternion.createFromYawPitchRoll(rotateVector.y / 180 * Math.PI, rotateVector.x / 180 * Math.PI, rotateVector.z / 180 * Math.PI, quaternion);
         
         //cube
-        this.cube.transform.rotate(rotateVector, false, false);
-        let oldposition_cube: Laya.Vector3 = new Laya.Vector3(this.cube.transform.position.x - pivotVector.x,
-                                                            this.cube.transform.position.y - pivotVector.y, 
-                                                            this.cube.transform.position.z - pivotVector.z);
-        let newposition_cube: Laya.Vector3 = new Laya.Vector3();
-        Laya.Vector3.transformQuat(oldposition_cube, quaternion, newposition_cube);
-        this.cube.transform.position = new Laya.Vector3(newposition_cube.x + pivotVector.x,
-                                                        newposition_cube.y + pivotVector.y, 
-                                                        newposition_cube.z + pivotVector.z);   
+        item.transform.rotate(rotateVector, false, false);
+        let oldposition_item: Laya.Vector3 = new Laya.Vector3(item.transform.position.x - pivotVector.x,
+                                                            item.transform.position.y - pivotVector.y, 
+                                                            item.transform.position.z - pivotVector.z);
+        let newposition_item: Laya.Vector3 = new Laya.Vector3();
+        Laya.Vector3.transformQuat(oldposition_item, quaternion, newposition_item);
+        item.transform.position = new Laya.Vector3(newposition_item.x + pivotVector.x,
+                                                        newposition_item.y + pivotVector.y, 
+                                                        newposition_item.z + pivotVector.z);   
     }
     updateLightPos () {
         //更新灯光位置
@@ -573,25 +592,147 @@ class GameView {
         this.canOperate = false;
         this.fallStraightWinAni(0.2, 27);
     }
+    fall_straight_lose (block: Laya.MeshSprite3D) {
+        this.canOperate = false;
+        this.fallStraightLoseAni(block, 0.2, 27);
+    }
     fall_in (height: number) {
         this.fallInAni(1, height);
     }
+    checkEmpty (pos: Laya.Vector3): boolean{
+        if (pos.x >= this.MAX_WIDTH || pos.x < 0 || pos.z >= this.MAX_LENGTH || pos.z < 0) {
+            return true;
+        } else if (this.map_info[pos.z][pos.x] === Block.EMPTY) {
+            return true;
+        } else if (this.map_info[pos.z][pos.x] === Block.IRON && this.getIronInfo(pos.x, pos.z)["state"] === false) {
+            return true;
+        }
+        return false;
+    }
+    getSwitchInfo (x: number, z: number): Object{
+        for (let i: number = 0, len: number = this.switch_info.length; i < len; i++) {
+            if (this.switch_info[i]["switch_pos"][0] === z 
+            && this.switch_info[i]["switch_pos"][1] === x) {
+                return this.switch_info[i];
+            }
+        }
+        return null;
+    }
+    getIronInfo (x: number, z: number): Object{
+        for (let i: number = 0, len: number = this.switch_info.length; i < len; i++) {
+            for (let j: number = 0, wid: number = this.switch_info[i]["control_list"].length; j < wid; j++) {
+                if (this.switch_info[i]["control_list"][j]["iron_pos"][0] === z
+                && this.switch_info[i]["control_list"][j]["iron_pos"][1] === x) {
+                    return this.switch_info[i]["control_list"][j];
+                }
+            }
+        }
+        return null;
+    }
+    controlTriggers (trigger: Object): void{
+        if (trigger["used"] && trigger["once"]) {
+            return;
+        }
+        trigger["used"] = true;
+        for (let i: number = 0, len: number = trigger["control_list"].length; i < len; i++) {
+            if (trigger["control_list"][i]["state"]) {
+                trigger["control_list"][i]["state"] = false;
+                this.moveTriggersOff(trigger["control_list"][i]);
+            } else {
+                trigger["control_list"][i]["state"] = true;
+                this.moveTriggersOn(trigger["control_list"][i]);
+            }
+        }
+    }
+    setTriggers (): void{
+        for (let i: number = 0, len: number = this.switch_info.length; i < len; i++) {
+            for (let j: number = 0, wid: number = this.switch_info[i]["control_list"].length; j < wid; j++) {
+                if (!this.switch_info[i]["control_list"][j]["state"]) {
+                    this.moveTriggersOff(this.switch_info[i]["control_list"][j]);
+                }
+            }
+        }
+    }
+    moveTriggersOff (iron: Object): void{
+        let iron_block = this.map[iron["iron_pos"][1]][iron["iron_pos"][0]];
+        switch (iron["off"]) {
+            case "left":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x - 0.5,
+                                                            iron_block.transform.position.y - block_depth / 2,
+                                                            iron_block.transform.position.z) , new Laya.Vector3(0, 0, -20), 9);
+            break;
+            case "right":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x + 0.5,
+                                                            iron_block.transform.position.y - block_depth / 2,
+                                                            iron_block.transform.position.z) , new Laya.Vector3(0, 0, 20), 9);
+            break;
+            case "up":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x,
+                                                            iron_block.transform.position.y - block_depth / 2,
+                                                            iron_block.transform.position.z - 0.5) , new Laya.Vector3(20, 0, 0), 9);
+            break;
+            case "down":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x,
+                                                            iron_block.transform.position.y - block_depth / 2,
+                                                            iron_block.transform.position.z + 0.5) , new Laya.Vector3(-20, 0, 0), 9);
+            break;
+            default:
+                console.log("moveTriggersOff exception");
+            break;
+        }
+    }
+    moveTriggersOn (iron: Object): void{
+        let iron_block = this.map[iron["iron_pos"][1]][iron["iron_pos"][0]];
+        switch (iron["off"]) {
+            case "left":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x + 0.5,
+                                                            iron_block.transform.position.y + block_depth / 2,
+                                                            iron_block.transform.position.z) , new Laya.Vector3(0, 0, 20), 9);
+            break;
+            case "right":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x - 0.5,
+                                                            iron_block.transform.position.y + block_depth / 2,
+                                                            iron_block.transform.position.z) , new Laya.Vector3(0, 0, -20), 9);
+            break;
+            case "up":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x,
+                                                            iron_block.transform.position.y + block_depth / 2,
+                                                            iron_block.transform.position.z + 0.5) , new Laya.Vector3(-20, 0, 0), 9);
+            break;
+            case "down":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x,
+                                                            iron_block.transform.position.y + block_depth / 2,
+                                                            iron_block.transform.position.z - 0.5) , new Laya.Vector3(20, 0, 0), 9);
+            break;
+            default:
+                console.log("moveTriggersOn exception");
+            break;
+        }
+    }
+    ironRotateAni (iron_block: Laya.MeshSprite3D, pivotVector: Laya.Vector3, rotateVector: Laya.Vector3, times: number) {
+        //异步的
+        let count = 0;
+        let newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(() => {
+            this.doIronRotate(iron_block, pivotVector, rotateVector);
+            count++;
+            if(count >= times){
+                //旋转180度调用回调函数
+                clearInterval(newTimer);
+            }
+        }, millisec);
+    }
+    doIronRotate (iron_block: Laya.MeshSprite3D, pivotVector: Laya.Vector3, rotateVector: Laya.Vector3) {
+        this.myRotate(iron_block, pivotVector, rotateVector);
+    }
+    split (): void{
+
+    }
     checkFall (): State {
         //普通掉落
-        let fall_1: boolean;
-        let fall_2: boolean;
-        if (this.cube1_pos.x >= this.MAX_WIDTH || this.cube1_pos.x < 0 || 
-            this.cube1_pos.z >= this.MAX_LENGTH || this.cube1_pos.z < 0) {
-                fall_1 = true;
-        } else {
-            fall_1 = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.EMPTY);
-        }
-        if (this.cube2_pos.x >= this.MAX_WIDTH || this.cube2_pos.x < 0 || 
-            this.cube2_pos.z >= this.MAX_LENGTH || this.cube2_pos.z < 0) {
-                fall_2 = true;
-        } else {
-            fall_2 = (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.EMPTY);
-        }
+        let fall_1: boolean = this.checkEmpty(this.cube1_pos);
+        let fall_2: boolean = this.checkEmpty(this.cube2_pos);
         if (fall_1 === true && fall_2 === true) {
             this.fall_full(this.lastMove);
             return State.FAILURE;
@@ -604,6 +745,11 @@ class GameView {
         }
 
         //红木掉落
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+        && this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.MUBAN) {
+            this.fall_straight_lose(this.map[this.cube1_pos.x][this.cube1_pos.z]);
+            return State.FAILURE;
+        }
 
         //终点掉落
         let win_1: boolean = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.END);
@@ -612,13 +758,31 @@ class GameView {
             this.fall_straight_win();
             return State.SUCCESS;
         }
+
+        //踩到轻机关
+        if (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.LIGHT) {
+            this.controlTriggers(this.getSwitchInfo(this.cube1_pos.x, this.cube1_pos.z));
+        }
+        if (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.LIGHT) {
+            this.controlTriggers(this.getSwitchInfo(this.cube2_pos.x, this.cube2_pos.z));
+        }
+        //踩到重机关
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+        && this.map_info[this.cube1_pos.z][this.cube2_pos.x] === Block.HEAVY) {
+            this.controlTriggers(this.getSwitchInfo(this.cube1_pos.x, this.cube1_pos.z));
+        }
+        //踩到分身机关
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+        && this.map_info[this.cube1_pos.z][this.cube2_pos.x] === Block.SPLIT) {
+            this.split();
+        }
         return State.GAMING;
     }
     checkState () {
         //检查游戏状态 判断是否应该重新开始 或者进行下一关
         let currentState: State = this.checkFall();
         if (currentState === State.FAILURE) {
-            //啥也不用干 因为会在掉落动画结束后处理 搜索 
+            //啥也不用干 因为会在掉落动画结束后处理
             return;
         } else if(currentState === State.SUCCESS) {
             //啥也不用干 因为会在掉落动画结束后处理

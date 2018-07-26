@@ -25,7 +25,7 @@ module ui {
 		public movesLabel:Laya.Label;
 		public timeLabel:Laya.Label;
 
-        public static  uiView:any ={"type":"Dialog","props":{"width":1334,"top":0,"left":0,"height":300},"child":[{"type":"Button","props":{"width":50,"var":"pauseButton","top":50,"skin":"pause.png","left":50,"height":50}},{"type":"Label","props":{"width":300,"var":"movesLabel","top":10,"text":"步数","left":200,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}},{"type":"Label","props":{"width":300,"var":"timeLabel","top":10,"text":"时间","left":600,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}}]};
+        public static  uiView:any ={"type":"Dialog","props":{"width":1334,"top":0,"left":0,"height":300},"child":[{"type":"Button","props":{"width":50,"var":"pauseButton","top":50,"skin":"pause.png","left":50,"height":50}},{"type":"Label","props":{"width":300,"var":"movesLabel","top":10,"text":"步数：","left":200,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}},{"type":"Label","props":{"width":300,"var":"timeLabel","top":10,"text":"时间：","left":600,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}}]};
         constructor(){ super()}
         createChildren():void {
         
@@ -91,7 +91,7 @@ module ui {
 		public rightButton:Laya.Button;
 		public upButton:Laya.Button;
 
-        public static  uiView:any ={"type":"View","props":{"width":1334,"name":"start","height":750},"child":[{"type":"Button","props":{"width":120,"visible":true,"var":"leftButton","stateNum":2,"skin":"arrow_large_4.png","rotation":0,"mouseEnabled":true,"left":50,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"var":"downButton","stateNum":2,"skin":"arrow_large_3.png","rotation":0,"right":50,"mouseEnabled":true,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"visible":true,"var":"rightButton","stateNum":2,"skin":"arrow_large_1.png","rotation":0,"right":50,"mouseEnabled":true,"height":120,"bottom":240}},{"type":"Button","props":{"width":120,"visible":true,"var":"upButton","stateNum":2,"skin":"arrow_large_2.png","rotation":0,"mouseEnabled":true,"left":50,"height":120,"bottom":240}}]};
+        public static  uiView:any ={"type":"View","props":{"width":1334,"name":"start","height":750},"child":[{"type":"Button","props":{"width":120,"visible":true,"var":"leftButton","stateNum":2,"skin":"arrow_large_4.png","rotation":45,"pivotY":60,"pivotX":59,"mouseEnabled":true,"left":50,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"var":"downButton","stateNum":2,"skin":"arrow_large_3.png","rotation":-45,"right":50,"pivotY":60,"pivotX":61,"mouseEnabled":true,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"visible":true,"var":"rightButton","stateNum":2,"skin":"arrow_large_1.png","rotation":-45,"right":50,"pivotY":60,"pivotX":59,"mouseEnabled":true,"height":120,"bottom":240}},{"type":"Button","props":{"width":120,"visible":true,"var":"upButton","stateNum":2,"skin":"arrow_large_2.png","rotation":45,"pivotY":59,"pivotX":60,"mouseEnabled":true,"left":50,"height":120,"bottom":240}}]};
         constructor(){ super()}
         createChildren():void {
         

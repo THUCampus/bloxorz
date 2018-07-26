@@ -12,6 +12,7 @@ class MenuView {
     //状态
     private pageState: Page;
     private currentLevel: number;
+    public stepcount: number;
 
     constructor () {
         let res: Array<any> = [{url:"arrow_large_1.png",type:Laya.Loader.IMAGE},
@@ -141,12 +142,12 @@ class MenuView {
     startToHelp () {
         this.removeLogo();
         this.pageState = Page.Help;
-        this.loadHelp();
+        this.addHelp();
     }
     helpToStart () {
         this.removeHelp();
         this.pageState = Page.Start;
-        this.loadLogo();
+        this.addLogo();
     }
     startToSelect () {
         this.removeLogo();
@@ -188,6 +189,10 @@ class MenuView {
             case Page.Select:
                 this.selectToStart();
             break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+            break;
             default:
                 console.log("no such page");
             break;
@@ -204,6 +209,10 @@ class MenuView {
             case Page.Select:
                 this.selectToStart();
             break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+            break;
             default:
                 console.log("no such page");
             break;
@@ -219,6 +228,10 @@ class MenuView {
             break;
             case Page.Select:
                 this.selectToStart();
+            break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
             break;
             default:
                 console.log("no such page");
@@ -237,6 +250,10 @@ class MenuView {
             case Page.Select:
                 this.selectToGame(this.currentLevel);
             break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+            break;
             default:
                 console.log("no such page");
             break;
@@ -249,5 +266,9 @@ class MenuView {
     }    
     public getCurrentLevel(): number{
         return this.currentLevel;
+    }
+
+    public setMovesCount(): void{
+        this.gameBar.movesLabel.text = "步数: " + this.stepcount;
     }
 }

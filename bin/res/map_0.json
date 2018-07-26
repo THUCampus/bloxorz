@@ -42,9 +42,32 @@
     0
   ],
   "triggers": [
+    {
+      "switch_pos": [
+        0,
+        1
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+      ]
+    },
+    {
+      "switch_pos": [
+        2,
+        2
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+      ]
+    }
   ],
   "url_block": "res/block.png",
   "url_iron": "res/iron.png",
   "url_muban": "res/muban.png",
-  "url_cube": "res/ice.png"
+  "url_cube": "res/ice.png",
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
 }

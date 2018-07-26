@@ -28,7 +28,7 @@
         {
             "x":15,
             "type":"Label",
-            "props":{"width":300,"var":"movesLabel","top":10,"text":"步数","left":200,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"},
+            "props":{"width":300,"var":"movesLabel","top":10,"text":"步数：","left":200,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"},
             "nodeParent":1,
             "label":"Label(movesLabel)",
             "isDirectory":false,
@@ -41,7 +41,7 @@
         {
             "x":15,
             "type":"Label",
-            "props":{"width":300,"var":"timeLabel","top":10,"text":"时间","left":600,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"},
+            "props":{"width":300,"var":"timeLabel","top":10,"text":"时间：","left":600,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"},
             "nodeParent":1,
             "label":"Label(timeLabel)",
             "isDirectory":false,

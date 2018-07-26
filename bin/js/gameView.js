@@ -24,7 +24,7 @@ var Block;
     Block[Block["MUBAN"] = 3] = "MUBAN";
     Block[Block["LIGHT"] = 4] = "LIGHT";
     Block[Block["HEAVY"] = 5] = "HEAVY";
-    Block[Block["FLASH"] = 6] = "FLASH";
+    Block[Block["SPLIT"] = 6] = "SPLIT";
     Block[Block["END"] = 7] = "END";
 })(Block || (Block = {}));
 ;
@@ -35,8 +35,9 @@ var State;
     State[State["FAILURE"] = 2] = "FAILURE";
 })(State || (State = {}));
 ;
-//计时器间隔
-var millisec = 10;
+//一些常数
+var block_depth = 0.1; //地块厚度
+var millisec = 10; //计时器间隔
 var GameView = /** @class */ (function () {
     function GameView(gate_index, parent) {
         //构造函数
@@ -54,6 +55,8 @@ var GameView = /** @class */ (function () {
         this.messageQueue = new Array();
         this.messageBusy = false;
         this.canOperate = false;
+        this.parent.stepcount = 0;
+        this.parent.setMovesCount();
         //调用loadView函数加载场景内容
         var gate_file = this.indexToString(this.gate_index);
         var levels_file = 'res/levels.json';
@@ -76,9 +79,6 @@ var GameView = /** @class */ (function () {
         var json_info = Laya.Loader.getRes(gate_file);
         //初始化类成员变量
         this.camera_pos = new Laya.Vector3(json_info["camera_pos"][0], json_info["camera_pos"][1], json_info["camera_pos"][2]);
-        //this.camera_rotate = new Laya.Vector3(json_info["camera_rotate"][0], 
-        //                              json_info["camera_rotate"][1], 
-        //                            json_info["camera_rotate"][2]);
         //灯光
         this.light_range = 3;
         this.light_height = 3;
@@ -88,11 +88,16 @@ var GameView = /** @class */ (function () {
         this.BLOCK_IRON_URL = json_info["url_iron"];
         this.BLOCK_MUBAN_URL = json_info["url_muban"];
         this.CUBE_URL = json_info["url_cube"];
+        this.BLOCK_SWITCH_LIGHT_URL = json_info["url_switch_light"];
+        this.BLOCK_SWITCH_HEAVY_URL = json_info["url_switch_heavy"];
+        this.BLOCK_SWITCH_SPLIT_URL = json_info["url_switch_split"];
         //地图
         this.map_info = json_info["map"];
         this.MAX_LENGTH = json_info["map_length"]; //上下
         this.MAX_WIDTH = json_info["map_width"]; //左右 
         this.start_pos = json_info["startpos"];
+        //机关
+        this.switch_info = json_info["triggers"];
         //元素位置信息
         this.cube_pos_init = new Laya.Vector3(this.start_pos[1], 0, this.start_pos[0]);
         this.cube1_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y, this.cube_pos_init.z);
@@ -157,8 +162,6 @@ var GameView = /** @class */ (function () {
         camera.orthographic = true;
     };
     GameView.prototype.loadMap = function () {
-        //一些常数
-        var block_depth = 0.1; //地块厚度
         //地块材质
         var material_block = new Laya.StandardMaterial();
         material_block.diffuseTexture = Laya.Texture2D.load(this.BLOCK_URL);
@@ -166,6 +169,12 @@ var GameView = /** @class */ (function () {
         material_iron.diffuseTexture = Laya.Texture2D.load(this.BLOCK_IRON_URL);
         var material_muban = new Laya.StandardMaterial();
         material_muban.diffuseTexture = Laya.Texture2D.load(this.BLOCK_MUBAN_URL);
+        var material_switch_light = new Laya.StandardMaterial();
+        material_switch_light.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_LIGHT_URL);
+        var material_switch_heavy = new Laya.StandardMaterial();
+        material_switch_heavy.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_HEAVY_URL);
+        var material_switch_split = new Laya.StandardMaterial();
+        material_switch_split.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_SPLIT_URL);
         //添加地形
         this.map = new Array();
         for (var i = 0; i < this.MAX_WIDTH; i++) {
@@ -178,38 +187,38 @@ var GameView = /** @class */ (function () {
                     case Block.ORDINARY:
                         //普通地块
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, block_depth)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
                         this.map[i][j].meshRender.material = material_block;
                         break;
                     case Block.IRON:
                         //机关地块
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
                         this.map[i][j].meshRender.material = material_iron;
                         break;
                     case Block.MUBAN:
                         //木地块
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
                         this.map[i][j].meshRender.material = material_muban;
                         break;
                     case Block.LIGHT:
                         //轻压机关
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
-                        this.map[i][j].meshRender.material = material_block;
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_switch_light;
                         break;
                     case Block.HEAVY:
                         //重压机关
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
-                        this.map[i][j].meshRender.material = material_block;
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_switch_heavy;
                         break;
-                    case Block.FLASH:
+                    case Block.SPLIT:
                         //分身机关
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
-                        this.map[i][j].meshRender.material = material_block;
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_switch_split;
                         break;
                     case Block.END:
                         //终点
@@ -219,6 +228,7 @@ var GameView = /** @class */ (function () {
                 }
             }
         }
+        this.setTriggers();
     };
     GameView.prototype.loadCube = function () {
         //cube
@@ -373,7 +383,7 @@ var GameView = /** @class */ (function () {
             }
         }, millisec);
     };
-    GameView.prototype.fallStraightLoseAni = function (rate, times) {
+    GameView.prototype.fallStraightLoseAni = function (block, rate, times) {
         var _this = this;
         //异步的
         var count = 0;
@@ -381,6 +391,7 @@ var GameView = /** @class */ (function () {
         clearInterval(newTimer);
         newTimer = setInterval(function () {
             _this.doFallStraight(rate);
+            _this.doFallBlock(block, rate + 0.1);
             count++;
             if (count >= times) {
                 clearInterval(newTimer);
@@ -423,17 +434,20 @@ var GameView = /** @class */ (function () {
     /**cube动作接口函数调用的动画函数 代码块结束 */
     /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块开始 */
     GameView.prototype.doFall = function (pivotVector, rotateVector) {
-        this.myRotate(pivotVector, rotateVector);
-        this.myFallStraight(0.5);
+        this.myRotate(this.cube, pivotVector, rotateVector);
+        this.myFallStraight(this.cube, 0.5);
         this.updateLightPos();
     };
     GameView.prototype.doRotate = function (pivotVector, rotateVector) {
-        this.myRotate(pivotVector, rotateVector);
+        this.myRotate(this.cube, pivotVector, rotateVector);
         this.updateLightPos();
     };
     GameView.prototype.doFallStraight = function (rate) {
-        this.myFallStraight(rate);
+        this.myFallStraight(this.cube, rate);
         this.updateLightPos();
+    };
+    GameView.prototype.doFallBlock = function (block, rate) {
+        this.myFallStraight(block, rate);
     };
     GameView.prototype.doDark = function () {
         if (!this.light_global_on) {
@@ -445,21 +459,21 @@ var GameView = /** @class */ (function () {
     };
     /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块结束 */
     /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块开始 */
-    GameView.prototype.myFallStraight = function (rate) {
-        this.cube.transform.position = new Laya.Vector3(this.cube.transform.position.x, this.cube.transform.position.y - rate, this.cube.transform.position.z);
+    GameView.prototype.myFallStraight = function (item, rate) {
+        item.transform.position = new Laya.Vector3(item.transform.position.x, item.transform.position.y - rate, item.transform.position.z);
     };
-    GameView.prototype.myRotate = function (pivotVector, rotateVector) {
+    GameView.prototype.myRotate = function (item, pivotVector, rotateVector) {
         //Laya的旋转机制有毒 自己写了cube旋转函数 支持翻转
         //pivotVector 是旋转轴
         //rotateVector 是旋转方向及角度
         var quaternion = new Laya.Quaternion();
         Laya.Quaternion.createFromYawPitchRoll(rotateVector.y / 180 * Math.PI, rotateVector.x / 180 * Math.PI, rotateVector.z / 180 * Math.PI, quaternion);
         //cube
-        this.cube.transform.rotate(rotateVector, false, false);
-        var oldposition_cube = new Laya.Vector3(this.cube.transform.position.x - pivotVector.x, this.cube.transform.position.y - pivotVector.y, this.cube.transform.position.z - pivotVector.z);
-        var newposition_cube = new Laya.Vector3();
-        Laya.Vector3.transformQuat(oldposition_cube, quaternion, newposition_cube);
-        this.cube.transform.position = new Laya.Vector3(newposition_cube.x + pivotVector.x, newposition_cube.y + pivotVector.y, newposition_cube.z + pivotVector.z);
+        item.transform.rotate(rotateVector, false, false);
+        var oldposition_item = new Laya.Vector3(item.transform.position.x - pivotVector.x, item.transform.position.y - pivotVector.y, item.transform.position.z - pivotVector.z);
+        var newposition_item = new Laya.Vector3();
+        Laya.Vector3.transformQuat(oldposition_item, quaternion, newposition_item);
+        item.transform.position = new Laya.Vector3(newposition_item.x + pivotVector.x, newposition_item.y + pivotVector.y, newposition_item.z + pivotVector.z);
     };
     GameView.prototype.updateLightPos = function () {
         //更新灯光位置
@@ -547,27 +561,134 @@ var GameView = /** @class */ (function () {
         this.canOperate = false;
         this.fallStraightWinAni(0.2, 27);
     };
+    GameView.prototype.fall_straight_lose = function (block) {
+        this.canOperate = false;
+        this.fallStraightLoseAni(block, 0.2, 27);
+    };
     GameView.prototype.fall_in = function (height) {
         this.fallInAni(1, height);
     };
+    GameView.prototype.checkEmpty = function (pos) {
+        if (pos.x >= this.MAX_WIDTH || pos.x < 0 || pos.z >= this.MAX_LENGTH || pos.z < 0) {
+            return true;
+        }
+        else if (this.map_info[pos.z][pos.x] === Block.EMPTY) {
+            return true;
+        }
+        else if (this.map_info[pos.z][pos.x] === Block.IRON && this.getIronInfo(pos.x, pos.z)["state"] === false) {
+            return true;
+        }
+        return false;
+    };
+    GameView.prototype.getSwitchInfo = function (x, z) {
+        for (var i = 0, len = this.switch_info.length; i < len; i++) {
+            if (this.switch_info[i]["switch_pos"][0] === z
+                && this.switch_info[i]["switch_pos"][1] === x) {
+                return this.switch_info[i];
+            }
+        }
+        return null;
+    };
+    GameView.prototype.getIronInfo = function (x, z) {
+        for (var i = 0, len = this.switch_info.length; i < len; i++) {
+            for (var j = 0, wid = this.switch_info[i]["control_list"].length; j < wid; j++) {
+                if (this.switch_info[i]["control_list"][j]["iron_pos"][0] === z
+                    && this.switch_info[i]["control_list"][j]["iron_pos"][1] === x) {
+                    return this.switch_info[i]["control_list"][j];
+                }
+            }
+        }
+        return null;
+    };
+    GameView.prototype.controlTriggers = function (trigger) {
+        if (trigger["used"] && trigger["once"]) {
+            return;
+        }
+        trigger["used"] = true;
+        for (var i = 0, len = trigger["control_list"].length; i < len; i++) {
+            if (trigger["control_list"][i]["state"]) {
+                trigger["control_list"][i]["state"] = false;
+                this.moveTriggersOff(trigger["control_list"][i]);
+            }
+            else {
+                trigger["control_list"][i]["state"] = true;
+                this.moveTriggersOn(trigger["control_list"][i]);
+            }
+        }
+    };
+    GameView.prototype.setTriggers = function () {
+        for (var i = 0, len = this.switch_info.length; i < len; i++) {
+            for (var j = 0, wid = this.switch_info[i]["control_list"].length; j < wid; j++) {
+                if (!this.switch_info[i]["control_list"][j]["state"]) {
+                    this.moveTriggersOff(this.switch_info[i]["control_list"][j]);
+                }
+            }
+        }
+    };
+    GameView.prototype.moveTriggersOff = function (iron) {
+        var iron_block = this.map[iron["iron_pos"][1]][iron["iron_pos"][0]];
+        switch (iron["off"]) {
+            case "left":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x - 0.5, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, -20), 9);
+                break;
+            case "right":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x + 0.5, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, 20), 9);
+                break;
+            case "up":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z - 0.5), new Laya.Vector3(20, 0, 0), 9);
+                break;
+            case "down":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z + 0.5), new Laya.Vector3(-20, 0, 0), 9);
+                break;
+            default:
+                console.log("moveTriggersOff exception");
+                break;
+        }
+    };
+    GameView.prototype.moveTriggersOn = function (iron) {
+        var iron_block = this.map[iron["iron_pos"][1]][iron["iron_pos"][0]];
+        switch (iron["off"]) {
+            case "left":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x + 0.5, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, 20), 9);
+                break;
+            case "right":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x - 0.5, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, -20), 9);
+                break;
+            case "up":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z + 0.5), new Laya.Vector3(-20, 0, 0), 9);
+                break;
+            case "down":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z - 0.5), new Laya.Vector3(20, 0, 0), 9);
+                break;
+            default:
+                console.log("moveTriggersOn exception");
+                break;
+        }
+    };
+    GameView.prototype.ironRotateAni = function (iron_block, pivotVector, rotateVector, times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doIronRotate(iron_block, pivotVector, rotateVector);
+            count++;
+            if (count >= times) {
+                //旋转180度调用回调函数
+                clearInterval(newTimer);
+            }
+        }, millisec);
+    };
+    GameView.prototype.doIronRotate = function (iron_block, pivotVector, rotateVector) {
+        this.myRotate(iron_block, pivotVector, rotateVector);
+    };
+    GameView.prototype.split = function () {
+    };
     GameView.prototype.checkFall = function () {
         //普通掉落
-        var fall_1;
-        var fall_2;
-        if (this.cube1_pos.x >= this.MAX_WIDTH || this.cube1_pos.x < 0 ||
-            this.cube1_pos.z >= this.MAX_LENGTH || this.cube1_pos.z < 0) {
-            fall_1 = true;
-        }
-        else {
-            fall_1 = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.EMPTY);
-        }
-        if (this.cube2_pos.x >= this.MAX_WIDTH || this.cube2_pos.x < 0 ||
-            this.cube2_pos.z >= this.MAX_LENGTH || this.cube2_pos.z < 0) {
-            fall_2 = true;
-        }
-        else {
-            fall_2 = (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.EMPTY);
-        }
+        var fall_1 = this.checkEmpty(this.cube1_pos);
+        var fall_2 = this.checkEmpty(this.cube2_pos);
         if (fall_1 === true && fall_2 === true) {
             this.fall_full(this.lastMove);
             return State.FAILURE;
@@ -581,6 +702,11 @@ var GameView = /** @class */ (function () {
             return State.FAILURE;
         }
         //红木掉落
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+            && this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.MUBAN) {
+            this.fall_straight_lose(this.map[this.cube1_pos.x][this.cube1_pos.z]);
+            return State.FAILURE;
+        }
         //终点掉落
         var win_1 = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.END);
         var win_2 = (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.END);
@@ -588,13 +714,30 @@ var GameView = /** @class */ (function () {
             this.fall_straight_win();
             return State.SUCCESS;
         }
+        //踩到轻机关
+        if (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.LIGHT) {
+            this.controlTriggers(this.getSwitchInfo(this.cube1_pos.x, this.cube1_pos.z));
+        }
+        if (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.LIGHT) {
+            this.controlTriggers(this.getSwitchInfo(this.cube2_pos.x, this.cube2_pos.z));
+        }
+        //踩到重机关
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+            && this.map_info[this.cube1_pos.z][this.cube2_pos.x] === Block.HEAVY) {
+            this.controlTriggers(this.getSwitchInfo(this.cube1_pos.x, this.cube1_pos.z));
+        }
+        //踩到分身机关
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+            && this.map_info[this.cube1_pos.z][this.cube2_pos.x] === Block.SPLIT) {
+            this.split();
+        }
         return State.GAMING;
     };
     GameView.prototype.checkState = function () {
         //检查游戏状态 判断是否应该重新开始 或者进行下一关
         var currentState = this.checkFall();
         if (currentState === State.FAILURE) {
-            //啥也不用干 因为会在掉落动画结束后处理 搜索 
+            //啥也不用干 因为会在掉落动画结束后处理
             return;
         }
         else if (currentState === State.SUCCESS) {

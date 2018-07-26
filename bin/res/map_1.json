@@ -90,5 +90,8 @@
     2,
     4,
     8
-  ]
+  ],
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
 }

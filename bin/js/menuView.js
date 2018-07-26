@@ -130,12 +130,12 @@ var MenuView = /** @class */ (function () {
     MenuView.prototype.startToHelp = function () {
         this.removeLogo();
         this.pageState = Page.Help;
-        this.loadHelp();
+        this.addHelp();
     };
     MenuView.prototype.helpToStart = function () {
         this.removeHelp();
         this.pageState = Page.Start;
-        this.loadLogo();
+        this.addLogo();
     };
     MenuView.prototype.startToSelect = function () {
         this.removeLogo();
@@ -176,6 +176,10 @@ var MenuView = /** @class */ (function () {
             case Page.Select:
                 this.selectToStart();
                 break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+                break;
             default:
                 console.log("no such page");
                 break;
@@ -192,6 +196,10 @@ var MenuView = /** @class */ (function () {
             case Page.Select:
                 this.selectToStart();
                 break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+                break;
             default:
                 console.log("no such page");
                 break;
@@ -207,6 +215,10 @@ var MenuView = /** @class */ (function () {
                 break;
             case Page.Select:
                 this.selectToStart();
+                break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
                 break;
             default:
                 console.log("no such page");
@@ -225,6 +237,10 @@ var MenuView = /** @class */ (function () {
             case Page.Select:
                 this.selectToGame(this.currentLevel);
                 break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+                break;
             default:
                 console.log("no such page");
                 break;
@@ -236,6 +252,9 @@ var MenuView = /** @class */ (function () {
     };
     MenuView.prototype.getCurrentLevel = function () {
         return this.currentLevel;
+    };
+    MenuView.prototype.setMovesCount = function () {
+        this.gameBar.movesLabel.text = "步数: " + this.stepcount;
     };
     return MenuView;
 }());
