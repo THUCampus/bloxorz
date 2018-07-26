@@ -37,6 +37,7 @@ class GameView {
     public MAX_WIDTH: number;   //左右
     //机关
     public switch_info: Array<Object>;
+    public iron_list: Array<Object>;
     //灯光
     public light_range: number;
     public light_height: number;
@@ -98,6 +99,7 @@ class GameView {
     loadView (gate_file: string) {
         //读取关卡文件
         let json_info: JSON = Laya.Loader.getRes(gate_file);
+        Laya.Loader.clearRes(gate_file);
         //初始化类成员变量
         this.camera_pos = new Laya.Vector3(json_info["camera_pos"][0], 
                                         json_info["camera_pos"][1], 
@@ -121,6 +123,7 @@ class GameView {
         this.start_pos = json_info["startpos"];
         //机关
         this.switch_info = json_info["triggers"];
+        this.iron_list = json_info["iron_list"];
         //元素位置信息
         this.cube_pos_init = new Laya.Vector3(this.start_pos[1], 0, this.start_pos[0]);
         this.cube1_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y, this.cube_pos_init.z);
@@ -150,8 +153,7 @@ class GameView {
     }
     reload () {
         this.clearView();
-        let gate_file = this.indexToString(this.gate_index);
-        this.loadView(gate_file);
+        this.loadFile();
     }
     loadNext () {
         this.clearView();
@@ -172,6 +174,7 @@ class GameView {
         if (this.gate_info['levels'][this.gate_index] === -1) {
             this.gate_info['levels'][this.gate_index] = 0;
         }
+        
     }
     loadScene () {
         //添加3D场景
@@ -621,9 +624,9 @@ class GameView {
     getIronInfo (x: number, z: number): Object{
         for (let i: number = 0, len: number = this.switch_info.length; i < len; i++) {
             for (let j: number = 0, wid: number = this.switch_info[i]["control_list"].length; j < wid; j++) {
-                if (this.switch_info[i]["control_list"][j]["iron_pos"][0] === z
-                && this.switch_info[i]["control_list"][j]["iron_pos"][1] === x) {
-                    return this.switch_info[i]["control_list"][j];
+                if (this.iron_list[this.switch_info[i]["control_list"][j]["index"]]["iron_pos"][0] === z
+                && this.iron_list[this.switch_info[i]["control_list"][j]["index"]]["iron_pos"][1] === x) {
+                    return this.iron_list[this.switch_info[i]["control_list"][j]["index"]];
                 }
             }
         }
@@ -635,21 +638,40 @@ class GameView {
         }
         trigger["used"] = true;
         for (let i: number = 0, len: number = trigger["control_list"].length; i < len; i++) {
-            if (trigger["control_list"][i]["state"]) {
-                trigger["control_list"][i]["state"] = false;
-                this.moveTriggersOff(trigger["control_list"][i]);
+            if (trigger["control_list"][i]["type"] === "both") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === true) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = false;
+                    this.moveTriggersOff(this.iron_list[trigger["control_list"][i]["index"]]);
+                } else if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === false) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = true;
+                    this.moveTriggersOn(this.iron_list[trigger["control_list"][i]["index"]]);
+                } else {
+                    console.log("need write code");
+                }
+            }
+            if (trigger["control_list"][i]["type"] === "off") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === true) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = false;
+                    this.moveTriggersOff(this.iron_list[trigger["control_list"][i]["index"]]);
+                } else {
+                    console.log("need write code");
+                }
+            } else if(trigger["control_list"][i]["type"] === "on") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === false) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = true;
+                    this.moveTriggersOn(this.iron_list[trigger["control_list"][i]["index"]]);
+                } else {
+                    console.log("need write code");
+                }
             } else {
-                trigger["control_list"][i]["state"] = true;
-                this.moveTriggersOn(trigger["control_list"][i]);
+                console.log("not find control_list.type");
             }
         }
     }
     setTriggers (): void{
-        for (let i: number = 0, len: number = this.switch_info.length; i < len; i++) {
-            for (let j: number = 0, wid: number = this.switch_info[i]["control_list"].length; j < wid; j++) {
-                if (!this.switch_info[i]["control_list"][j]["state"]) {
-                    this.moveTriggersOff(this.switch_info[i]["control_list"][j]);
-                }
+        for (let i: number = 0, len: number = this.iron_list.length; i < len; i++) {
+            if (this.iron_list[i]["state"] === false) {
+                this.moveTriggersOff(this.iron_list[i]);
             }
         }
     }

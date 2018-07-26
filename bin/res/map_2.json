@@ -110,6 +110,40 @@
     4,
     1
   ],
+  "iron_list": [
+    {
+      "iron_pos": [
+        4,
+        4
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        4,
+        5
+      ],
+      "state": false,
+      "off": "right"
+    },
+    {
+      "iron_pos": [
+        4,
+        10
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        4,
+        11
+      ],
+      "state": false,
+      "off": "right"
+    }
+  ],
   "triggers": [
     {
       "switch_pos": [
@@ -120,20 +154,12 @@
       "used": false,
       "control_list": [
         {
-          "iron_pos": [
-            4,
-            4
-          ],
-          "state": false,
-          "off": "left"
+          "index": 0,
+          "type": "both"
         },
         {
-          "iron_pos": [
-            4,
-            5
-          ],
-          "state": false,
-          "off": "right"
+          "index": 1,
+          "type": "both"
         }
       ]
     },
@@ -146,20 +172,12 @@
       "used": false,
       "control_list": [
         {
-          "iron_pos": [
-            4,
-            10
-          ],
-          "state": false,
-          "off": "left"
+          "index": 2,
+          "type": "both"
         },
         {
-          "iron_pos": [
-            4,
-            11
-          ],
-          "state": false,
-          "off": "right"
+          "index": 3,
+          "type": "both"
         }
       ]
     }

@@ -77,6 +77,7 @@ var GameView = /** @class */ (function () {
     GameView.prototype.loadView = function (gate_file) {
         //读取关卡文件
         var json_info = Laya.Loader.getRes(gate_file);
+        Laya.Loader.clearRes(gate_file);
         //初始化类成员变量
         this.camera_pos = new Laya.Vector3(json_info["camera_pos"][0], json_info["camera_pos"][1], json_info["camera_pos"][2]);
         //灯光
@@ -98,6 +99,7 @@ var GameView = /** @class */ (function () {
         this.start_pos = json_info["startpos"];
         //机关
         this.switch_info = json_info["triggers"];
+        this.iron_list = json_info["iron_list"];
         //元素位置信息
         this.cube_pos_init = new Laya.Vector3(this.start_pos[1], 0, this.start_pos[0]);
         this.cube1_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y, this.cube_pos_init.z);
@@ -127,8 +129,7 @@ var GameView = /** @class */ (function () {
     };
     GameView.prototype.reload = function () {
         this.clearView();
-        var gate_file = this.indexToString(this.gate_index);
-        this.loadView(gate_file);
+        this.loadFile();
     };
     GameView.prototype.loadNext = function () {
         this.clearView();
@@ -592,9 +593,9 @@ var GameView = /** @class */ (function () {
     GameView.prototype.getIronInfo = function (x, z) {
         for (var i = 0, len = this.switch_info.length; i < len; i++) {
             for (var j = 0, wid = this.switch_info[i]["control_list"].length; j < wid; j++) {
-                if (this.switch_info[i]["control_list"][j]["iron_pos"][0] === z
-                    && this.switch_info[i]["control_list"][j]["iron_pos"][1] === x) {
-                    return this.switch_info[i]["control_list"][j];
+                if (this.iron_list[this.switch_info[i]["control_list"][j]["index"]]["iron_pos"][0] === z
+                    && this.iron_list[this.switch_info[i]["control_list"][j]["index"]]["iron_pos"][1] === x) {
+                    return this.iron_list[this.switch_info[i]["control_list"][j]["index"]];
                 }
             }
         }
@@ -606,22 +607,46 @@ var GameView = /** @class */ (function () {
         }
         trigger["used"] = true;
         for (var i = 0, len = trigger["control_list"].length; i < len; i++) {
-            if (trigger["control_list"][i]["state"]) {
-                trigger["control_list"][i]["state"] = false;
-                this.moveTriggersOff(trigger["control_list"][i]);
+            if (trigger["control_list"][i]["type"] === "both") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === true) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = false;
+                    this.moveTriggersOff(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === false) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = true;
+                    this.moveTriggersOn(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else {
+                    console.log("need write code");
+                }
+            }
+            if (trigger["control_list"][i]["type"] === "off") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === true) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = false;
+                    this.moveTriggersOff(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else {
+                    console.log("need write code");
+                }
+            }
+            else if (trigger["control_list"][i]["type"] === "on") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === false) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = true;
+                    this.moveTriggersOn(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else {
+                    console.log("need write code");
+                }
             }
             else {
-                trigger["control_list"][i]["state"] = true;
-                this.moveTriggersOn(trigger["control_list"][i]);
+                console.log("not find control_list.type");
             }
         }
     };
     GameView.prototype.setTriggers = function () {
-        for (var i = 0, len = this.switch_info.length; i < len; i++) {
-            for (var j = 0, wid = this.switch_info[i]["control_list"].length; j < wid; j++) {
-                if (!this.switch_info[i]["control_list"][j]["state"]) {
-                    this.moveTriggersOff(this.switch_info[i]["control_list"][j]);
-                }
+        for (var i = 0, len = this.iron_list.length; i < len; i++) {
+            if (this.iron_list[i]["state"] === false) {
+                this.moveTriggersOff(this.iron_list[i]);
             }
         }
     };
