@@ -21,7 +21,8 @@ class MenuView {
                             {url:"arrow_large_4.png",type:Laya.Loader.IMAGE},
                             {url:"pause.png",type:Laya.Loader.IMAGE},
                             {url:"button.png",type:Laya.Loader.IMAGE},
-                            {url:"btn_close.png",type:Laya.Loader.IMAGE}];
+                            {url:"btn_close.png",type:Laya.Loader.IMAGE},
+                            {url:"sound/bgm.mp3",type:Laya.Loader.SOUND}];
         Laya.loader.load(res,Laya.Handler.create(this, this.loadUI), null);
     }
 
@@ -36,6 +37,8 @@ class MenuView {
         //添加主界面
         this.pageState = Page.Start;
         this.addStartPage();
+        //播放BGM
+        this.playBGM();
     }
 
     /**加载各个界面 代码块开始 */
@@ -73,6 +76,9 @@ class MenuView {
     updateSelect () {
         //重新加载选关信息
         //this.selectList.update();
+    }
+    playBGM () {
+        Laya.SoundManager.playMusic("sound/bgm.mp3",0);
     }
     /**加载各个界面 代码块结束 */
 

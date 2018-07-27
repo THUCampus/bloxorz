@@ -26,7 +26,9 @@ class GameView {
     public cube_pos_init: Laya.Vector3
     public cube1_pos: Laya.Vector3;
     public cube2_pos: Laya.Vector3;
-    public center_pos: Laya.Vector3;
+    public center_pos_pre: Laya.Vector3;
+    public cube1_pos_pre: Laya.Vector3;
+    public cube2_pos_pre: Laya.Vector3;
 
     //关卡常量
     public gate_index: number;
@@ -298,21 +300,29 @@ class GameView {
     moveUp () {
         const up_pivot: Laya.Vector3 = new Laya.Vector3((this.cube1_pos.x + this.cube2_pos.x) / 2, -1, Math.min(this.cube1_pos.z, this.cube2_pos.z) - 0.5);
         this.lastMove = Direction.UP;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, up_pivot, new Laya.Vector3(-90, 0, 0));
+        this.makeSound();
         this.moveAni(up_pivot, new Laya.Vector3(-10, 0, 0), 9);       //异步的
     }
     moveDown () {
         const down_pivot: Laya.Vector3 = new Laya.Vector3((this.cube1_pos.x + this.cube2_pos.x) / 2, -1, Math.max(this.cube1_pos.z, this.cube2_pos.z) + 0.5);
         this.lastMove = Direction.DOWN;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, down_pivot, new Laya.Vector3(90, 0, 0));
+        this.makeSound();
         this.moveAni(down_pivot, new Laya.Vector3(10, 0, 0), 9);       //异步的
     }
     moveLeft () {
         const left_pivot: Laya.Vector3 = new Laya.Vector3(Math.min(this.cube1_pos.x, this.cube2_pos.x) - 0.5, -1, (this.cube1_pos.z + this.cube2_pos.z) / 2);
         this.lastMove = Direction.LEFT;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, left_pivot, new Laya.Vector3(0, 0, 90));
+        this.makeSound();
         this.moveAni(left_pivot, new Laya.Vector3(0, 0, 10), 9);       //异步的
     }
     moveRight () {
         const right_pivot: Laya.Vector3 = new Laya.Vector3(Math.max(this.cube1_pos.x, this.cube2_pos.x) + 0.5, -1, (this.cube1_pos.z + this.cube2_pos.z) / 2);
         this.lastMove = Direction.RIGHT;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, right_pivot, new Laya.Vector3(0, 0, -90));
+        this.makeSound();
         this.moveAni(right_pivot, new Laya.Vector3(0, 0, -10), 9);       //异步的
     }
     fallUp () {
@@ -512,6 +522,23 @@ class GameView {
                                                         newposition_item.y + pivotVector.y, 
                                                         newposition_item.z + pivotVector.z);   
     }
+    myPointRotate (position: Laya.Vector3, pivotVector: Laya.Vector3, rotateVector: Laya.Vector3): Laya.Vector3{
+        //Laya的旋转机制有毒 自己写了点的位置的旋转函数
+        //pivotVector 是旋转轴
+        //rotateVector 是旋转方向及角度
+        let quaternion: Laya.Quaternion = new Laya.Quaternion();
+        Laya.Quaternion.createFromYawPitchRoll(rotateVector.y / 180 * Math.PI, rotateVector.x / 180 * Math.PI, rotateVector.z / 180 * Math.PI, quaternion);
+        
+        //point
+        let oldposition: Laya.Vector3 = new Laya.Vector3(position.x - pivotVector.x,
+                                                            position.y - pivotVector.y, 
+                                                            position.z - pivotVector.z);
+        let newposition: Laya.Vector3 = new Laya.Vector3();
+        Laya.Vector3.transformQuat(oldposition, quaternion, newposition);
+        return new Laya.Vector3(newposition.x + pivotVector.x,
+                                                        newposition.y + pivotVector.y, 
+                                                        newposition.z + pivotVector.z);   
+    }
     updateLightPos () {
         //更新灯光位置
         //自发光
@@ -543,6 +570,30 @@ class GameView {
         } else if (center_z === cube_z) {
             this.cube1_pos = new Laya.Vector3(center_x, 0, center_z);
             this.cube2_pos = new Laya.Vector3(cube_x * 2 - center_x, 0, center_z);
+        } else {
+            //异常处理
+            console.log("updateCubePos需要异常处理！");
+        }
+    }
+    updateCubePosPre () {
+        //四舍五入修正坐标 尚未矫正偏角 不过实际效果偏角误差观察不出
+        let cube_x: number = Math.round(this.center_pos_pre.x * 2) / 2;
+        let cube_y: number = Math.round(this.center_pos_pre.y * 2) / 2;
+        let cube_z: number = Math.round(this.center_pos_pre.z * 2) / 2;
+        this.center_pos_pre = new Laya.Vector3(cube_x, cube_y, cube_z);
+        
+        //获取新的cube两方块位置
+        let center_x: number = Math.floor(cube_x);
+        let center_z: number = Math.floor(cube_z);
+        if (center_x === cube_x && center_z === cube_z) {
+            this.cube1_pos_pre = new Laya.Vector3(center_x, 0, center_z);
+            this.cube2_pos_pre = new Laya.Vector3(center_x, 1, center_z);
+        } else if (center_x === cube_x) {
+            this.cube1_pos_pre = new Laya.Vector3(center_x, 0, center_z);
+            this.cube2_pos_pre = new Laya.Vector3(center_x, 0, cube_z * 2 - center_z);
+        } else if (center_z === cube_z) {
+            this.cube1_pos_pre = new Laya.Vector3(center_x, 0, center_z);
+            this.cube2_pos_pre = new Laya.Vector3(cube_x * 2 - center_x, 0, center_z);
         } else {
             //异常处理
             console.log("updateCubePos需要异常处理！");
@@ -664,7 +715,7 @@ class GameView {
                     console.log("need write code");
                 }
             } else {
-                console.log("not find control_list.type");
+                console.log("not find control_list.type or type === both");
             }
         }
     }
@@ -751,6 +802,63 @@ class GameView {
     split (): void{
 
     }
+    playSound (name: string): void{
+        Laya.SoundManager.playSound("sound/" + name + ".mp3");
+    }
+    judgeType (position: Laya.Vector3): Block{
+        return this.map_info[position.z][position.x];
+    }
+    makeSound (): void{
+        //先修正一下预测位置
+        this.updateCubePosPre();
+
+        let name: string;
+
+        //普通掉落
+        let fall_1: boolean = this.checkEmpty(this.cube1_pos_pre);
+        let fall_2: boolean = this.checkEmpty(this.cube2_pos_pre);
+        if (fall_1 === true && fall_2 === true) {
+            name = "fall";
+        } else if (fall_1 === true) {
+            name = "fall";
+        } else if (fall_2 === true) {
+            name = "fall";
+        } else {
+            let type_1: Block = this.judgeType(this.cube1_pos_pre);
+            let type_2: Block = this.judgeType(this.cube2_pos_pre);
+            //发声有点复杂 暂时暴力一点 根据权重瞎选一个播放
+            //轻机关 优先
+            //然后 铁板
+            //木板 其次
+            //最后 石板
+            if (type_1 === Block.LIGHT || type_2 === Block.LIGHT) {
+                name = "trigger";
+            } else if (type_1 === Block.IRON) {
+                if (this.getIronInfo(this.cube1_pos_pre.x, this.cube1_pos_pre.z)["state"]) {
+                    name = "metal";
+                }
+            } else if (type_2 === Block.IRON) {
+                if (this.getIronInfo(this.cube2_pos_pre.x, this.cube2_pos_pre.z)["state"]) {
+                    name = "metal";
+                }
+            } else if (type_1 === Block.MUBAN || type_2 === Block.MUBAN) {
+                name = "wood";
+            } else if (this.cube1_pos_pre.x === this.cube2_pos_pre.x && this.cube1_pos_pre.z === this.cube2_pos_pre.z
+                    && type_1 === Block.HEAVY) {
+                name = "trigger";
+            } else if (this.cube1_pos_pre.x === this.cube2_pos_pre.x && this.cube1_pos_pre.z === this.cube2_pos_pre.z
+                    && type_1 === Block.SPLIT) {
+                name = "transform";
+            } else if (this.cube1_pos_pre.x === this.cube2_pos_pre.x && this.cube1_pos_pre.z === this.cube2_pos_pre.z
+                    && type_1 === Block.END) {
+                name = "end";
+            } else {
+                name = "stone";
+            }
+        }
+
+        this.playSound(name);
+    }
     checkFall (): State {
         //普通掉落
         let fall_1: boolean = this.checkEmpty(this.cube1_pos);
@@ -813,7 +921,6 @@ class GameView {
             //维持消息机制
             this.checkMessageQueue();
         }
-
     }
     restart () {
         this.restartAni(30);

@@ -1,0 +1,325 @@
+{
+  "light_on": true,
+  "map_length": 10,
+  "map_width": 14,
+  "map": [
+    [
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1,
+      4,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      2,
+      0,
+      0,
+      1,
+      7,
+      1,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      5,
+      1,
+      2,
+      2,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      2,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      2,
+      0,
+      0,
+      0,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ]
+  ],
+  "startpos": [
+    7,
+    1
+  ],
+  "iron_list": [
+    {
+      "iron_pos": [
+        3,
+        7
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        2,
+        13
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        3,
+        13
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        4,
+        8
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        4,
+        9
+      ],
+      "state": false,
+      "off": "right"
+    },
+    {
+      "iron_pos": [
+        6,
+        4
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        6,
+        5
+      ],
+      "state": false,
+      "off": "right"
+    },
+    {
+      "iron_pos": [
+        7,
+        2
+      ],
+      "state": true,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        8,
+        2
+      ],
+      "state": true,
+      "off": "left"
+    }
+  ],
+  "triggers": [
+    {
+      "switch_pos": [
+        2,
+        4
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 1,
+          "type": "on"
+        },
+        {
+          "index": 2,
+          "type": "on"
+        },
+        {
+          "index": 3,
+          "type": "off"
+        },
+        {
+          "index": 4,
+          "type": "off"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        6,
+        2
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 3,
+          "type": "on"
+        },
+        {
+          "index": 4,
+          "type": "on"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        8,
+        8
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "on"
+        },
+        {
+          "index": 5,
+          "type": "off"
+        },
+        {
+          "index": 6,
+          "type": "off"
+        }
+      ]
+    }
+  ],
+  "url_block": "res/block.png",
+  "url_iron": "res/iron.png",
+  "url_muban": "res/muban.png",
+  "url_cube": "res/ice.png",
+  "camera_pos": [
+    2,
+    6,
+    17
+  ],
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
+}

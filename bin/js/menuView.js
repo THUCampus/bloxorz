@@ -14,7 +14,8 @@ var MenuView = /** @class */ (function () {
             { url: "arrow_large_4.png", type: Laya.Loader.IMAGE },
             { url: "pause.png", type: Laya.Loader.IMAGE },
             { url: "button.png", type: Laya.Loader.IMAGE },
-            { url: "btn_close.png", type: Laya.Loader.IMAGE }];
+            { url: "btn_close.png", type: Laya.Loader.IMAGE },
+            { url: "sound/bgm.mp3", type: Laya.Loader.SOUND }];
         Laya.loader.load(res, Laya.Handler.create(this, this.loadUI), null);
     }
     MenuView.prototype.loadUI = function () {
@@ -28,6 +29,8 @@ var MenuView = /** @class */ (function () {
         //添加主界面
         this.pageState = Page.Start;
         this.addStartPage();
+        //播放BGM
+        this.playBGM();
     };
     /**加载各个界面 代码块开始 */
     MenuView.prototype.loadStartPage = function () {
@@ -65,12 +68,15 @@ var MenuView = /** @class */ (function () {
         //重新加载选关信息
         //this.selectList.update();
     };
+    MenuView.prototype.playBGM = function () {
+        Laya.SoundManager.playMusic("sound/bgm.mp3", 0);
+    };
     /**加载各个界面 代码块结束 */
     /**添加各个界面 代码块开始 */
     MenuView.prototype.addStartPage = function () {
         Laya.stage.addChild(this.startPage);
         //添加3D画面
-        this.addGame(15);
+        this.addGame(0);
         //添加logo
         this.addLogo();
     };
