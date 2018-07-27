@@ -86,7 +86,7 @@ class MenuView {
     addStartPage () {
         Laya.stage.addChild(this.startPage);
         //添加3D画面
-        this.addGame(0);
+        this.addGame(23);
         //添加logo
         this.addLogo();
     }
