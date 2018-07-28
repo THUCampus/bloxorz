@@ -30,13 +30,18 @@ module myUI{
         update (): void{
             this.levels = Laya.loader.getRes(this.levels_file);
             let defaultExist: boolean = false;
+            let i: number;
             let data: Array<Array<number>> = [];
-            for (let i: number = 1; i < this.levels['total_level']; i++) {
+            for (i = 1; i < this.levels['total_level'] + 1; i++) {
                 if (!defaultExist && this.levels['levels'][i] === -1) {
                     defaultExist = true;
                     this.parent.setCurrentLevel(i-1);
                 }
                 data.push([i, this.levels['levels'][i]]);
+            }
+            if (!defaultExist) {
+                defaultExist = true;
+                this.parent.setCurrentLevel(i-1);
             }
             this.list.array = data;
         }

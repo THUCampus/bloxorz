@@ -76,7 +76,7 @@ var MenuView = /** @class */ (function () {
     MenuView.prototype.addStartPage = function () {
         Laya.stage.addChild(this.startPage);
         //添加3D画面
-        this.addGame(23);
+        this.addGame(0);
         //添加logo
         this.addLogo();
     };
