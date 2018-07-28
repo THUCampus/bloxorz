@@ -25,7 +25,7 @@ module ui {
 		public movesLabel:Laya.Label;
 		public timeLabel:Laya.Label;
 
-        public static  uiView:any ={"type":"Dialog","props":{"width":1334,"top":0,"left":0,"height":300},"child":[{"type":"Button","props":{"width":50,"var":"pauseButton","top":50,"skin":"pause.png","left":50,"height":50}},{"type":"Label","props":{"width":300,"var":"movesLabel","top":10,"text":"步数：","left":200,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}},{"type":"Label","props":{"width":300,"var":"timeLabel","top":10,"text":"时间：","left":600,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}}]};
+        public static  uiView:any ={"type":"Dialog","props":{"width":1334,"top":0,"left":0,"height":300},"child":[{"type":"Button","props":{"width":50,"var":"pauseButton","top":50,"skin":"pause.png","left":50,"height":50}},{"type":"Label","props":{"width":300,"var":"movesLabel","top":10,"text":"步数","left":200,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}},{"type":"Label","props":{"width":300,"var":"timeLabel","top":10,"text":"时间","left":600,"height":30,"fontSize":30,"font":"Arial","color":"#ffffff"}}]};
         constructor(){ super()}
         createChildren():void {
         
@@ -70,6 +70,21 @@ module ui {
 }
 
 module ui {
+    export class rank_listUI extends Dialog {
+
+        public static  uiView:any ={"type":"Dialog","props":{"width":600,"height":800,"centerY":0,"centerX":0},"child":[{"type":"Button","props":{"width":200,"stateNum":3,"skin":"button.png","name":"close","labelSize":30,"labelFont":"SimHei","label":"关闭","height":50,"centerX":0,"bottom":50}}]};
+        constructor(){ super()}
+        createChildren():void {
+        
+            super.createChildren();
+            this.createView(ui.rank_listUI.uiView);
+
+        }
+
+    }
+}
+
+module ui {
     export class select_listUI extends View {
 
         public static  uiView:any ={"type":"View","props":{"width":900,"height":360,"centerX":0,"bottom":0}};
@@ -90,8 +105,9 @@ module ui {
 		public downButton:Laya.Button;
 		public rightButton:Laya.Button;
 		public upButton:Laya.Button;
+		public ranklistButton:Laya.Button;
 
-        public static  uiView:any ={"type":"View","props":{"width":1334,"name":"start","height":750},"child":[{"type":"Button","props":{"width":120,"visible":true,"var":"leftButton","stateNum":2,"skin":"arrow_large_4.png","rotation":45,"pivotY":60,"pivotX":59,"mouseEnabled":true,"left":50,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"var":"downButton","stateNum":2,"skin":"arrow_large_3.png","rotation":-45,"right":50,"pivotY":60,"pivotX":61,"mouseEnabled":true,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"visible":true,"var":"rightButton","stateNum":2,"skin":"arrow_large_1.png","rotation":-45,"right":50,"pivotY":60,"pivotX":59,"mouseEnabled":true,"height":120,"bottom":240}},{"type":"Button","props":{"width":120,"visible":true,"var":"upButton","stateNum":2,"skin":"arrow_large_2.png","rotation":45,"pivotY":59,"pivotX":60,"mouseEnabled":true,"left":50,"height":120,"bottom":240}}]};
+        public static  uiView:any ={"type":"View","props":{"width":1334,"name":"start","height":750},"child":[{"type":"Button","props":{"width":120,"visible":true,"var":"leftButton","stateNum":2,"skin":"arrow_large_4.png","rotation":0,"mouseEnabled":true,"left":50,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"var":"downButton","stateNum":2,"skin":"arrow_large_3.png","rotation":0,"right":50,"mouseEnabled":true,"height":120,"bottom":20}},{"type":"Button","props":{"width":120,"visible":true,"var":"rightButton","stateNum":2,"skin":"arrow_large_1.png","rotation":0,"right":50,"mouseEnabled":true,"height":120,"bottom":240}},{"type":"Button","props":{"width":120,"visible":true,"var":"upButton","stateNum":2,"skin":"arrow_large_2.png","rotation":0,"mouseEnabled":true,"left":50,"height":120,"bottom":240}},{"type":"Button","props":{"width":120,"var":"ranklistButton","top":10,"stateNum":3,"skin":"button.png","left":10,"labelSize":30,"labelFont":"SimHei","label":"排行榜","height":50}}]};
         constructor(){ super()}
         createChildren():void {
         

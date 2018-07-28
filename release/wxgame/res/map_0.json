@@ -1,27 +1,75 @@
-<<<<<<< Updated upstream
-{"map_width":10,"map_length":10,"url_block":"res/block.png","url_iron":"res/iron.png","url_muban":"res/muban.png","url_cube":"res/ice.png","map":[[1,1,1,0,0,1,1,1,0,0],[1,1,1,0,0,1,1,1,1,1],[1,1,1,0,0,1,1,0,0,1],[1,1,1,2,1,1,1,0,0,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,2,1,1,1,1,1,1],[1,1,1,1,1,1,3,1,1,1],[1,1,1,1,1,1,1,3,1,0],[0,0,1,1,1,1,0,0,0,0],[0,0,0,1,1,1,0,0,0,0]],"startpos":[3,3],"endpos":[8,6],"triggers":[]}
-=======
 {
-	"map_width": 10,
-	"map_length": 10,
-	"url_block": "res/block.png",
-	"url_iron": "res/iron.png",
-	"url_muban": "res/muban.png",
-	"url_cube": "res/ice.png",
-	"map": [
-            [1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
-            [1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
-            [1, 1, 1, 0, 0, 1, 1, 0, 0, 1],
-            [1, 1, 1, 2, 1, 1, 1, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 2, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 3, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 3, 1, 0],
-            [0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
-            [0, 0, 0, 1, 1, 1, 0, 0, 0, 0]
-	],
-	"startpos": [3,3],
-	"endpos": [8,6],
-	"triggers": []
+  "light_on": true,
+  "map_length": 4,
+  "map_width": 5,
+  "camera_pos": [
+    -1,
+    2,
+    10
+  ],
+  "map": [
+    [
+      8,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      4,
+      7,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0
+    ]
+  ],
+  "startpos": [
+    2,
+    0
+  ],
+  "iron_list": [
+  ],
+  "triggers": [
+    {
+      "switch_pos": [
+        0,
+        1
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+      ]
+    },
+    {
+      "switch_pos": [
+        2,
+        2
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+      ]
+    }
+  ],
+  "url_block": "res/block.png",
+  "url_iron": "res/iron.png",
+  "url_muban": "res/muban.png",
+  "url_cube": "res/ice.png",
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
 }
->>>>>>> Stashed changes

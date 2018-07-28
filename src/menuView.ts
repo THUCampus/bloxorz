@@ -1,6 +1,7 @@
 enum Page{Start, Help, Select, Game};
 
 class MenuView {
+    public opendata: OpenDataContext;
     //UI
     public startPage: ui.start_viewUI;
     public logo: ui.logoUI;
@@ -9,6 +10,7 @@ class MenuView {
     public gameView: GameView;
     public gameBar: ui.game_barUI;
     public pause: ui.pause_dialogUI;
+    public ranklist: view.rankList;
     //状态
     private pageState: Page;
     private currentLevel: number;
@@ -23,9 +25,14 @@ class MenuView {
                             {url:"button.png",type:Laya.Loader.IMAGE},
                             {url:"btn_close.png",type:Laya.Loader.IMAGE},
                             {url:"sound/bgm.mp3",type:Laya.Loader.SOUND}];
+        this.login();
         Laya.loader.load(res,Laya.Handler.create(this, this.loadUI), null);
     }
-
+    login()
+    {
+        this.opendata = wx.getOpenDataContext();
+        this.opendata.postMessage({type: 'init'});
+    }
     loadUI () {
         //加载各个界面
         this.loadStartPage();
@@ -50,10 +57,12 @@ class MenuView {
         this.startPage.downButton.on(Laya.Event.MOUSE_DOWN, this, this.downButtonCLicked);
         this.startPage.leftButton.on(Laya.Event.MOUSE_DOWN, this, this.leftButtonClicked);
         this.startPage.rightButton.on(Laya.Event.MOUSE_DOWN, this, this.rightButtonClicked);
+        this.startPage.ranklistButton.on(Laya.Event.MOUSE_DOWN, this, this.loadRankList);
     }
     loadLogo () {
         //加载主界面的logo
         this.logo = new ui.logoUI();
+
     }
     loadHelp () {
         //加载帮助界面
@@ -73,6 +82,13 @@ class MenuView {
         this.pause.backToGame.on(Laya.Event.MOUSE_DOWN, this, this.pauseToGame);
         this.pause.backToMain.on(Laya.Event.MOUSE_DOWN, this, this.pauseToStart);
     }
+    loadRankList()
+    {
+        //加载排行榜界面
+        this.ranklist = new view.rankList();
+        this.ranklist.draw();
+        Laya.stage.addChild(this.ranklist);
+    }
     updateSelect () {
         //重新加载选关信息
         //this.selectList.update();
@@ -86,7 +102,7 @@ class MenuView {
     addStartPage () {
         Laya.stage.addChild(this.startPage);
         //添加3D画面
-        this.addGame(23);
+        this.addGame(0);
         //添加logo
         this.addLogo();
     }

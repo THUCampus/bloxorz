@@ -3,7 +3,7 @@
 
 enum Direction{UP, DOWN, LEFT, RIGHT};
 enum Operation{UP, DOWN, LEFT, RIGHT};
-enum Block{EMPTY, ORDINARY, IRON, MUBAN, LIGHT, HEAVY, SPLIT, END};
+enum Block{EMPTY, ORDINARY, IRON, MUBAN, LIGHT, HEAVY, SPLIT, END, HELP};
 enum State{GAMING, SUCCESS, FAILURE};
 
 
@@ -159,6 +159,7 @@ class GameView {
     }
     loadNext () {
         this.clearView();
+        this.updatePassedLevel();
         this.computeScore();
         this.unlockNextLevel();
         this.loadFile();
@@ -171,12 +172,20 @@ class GameView {
     computeScore () {
         this.gate_info['levels'][this.gate_index] = 1;
     }
+    updatePassedLevel(){
+        if(this.gate_info['levels'][this.gate_index] === 0)
+        {
+            this.gate_info['passed_level'] += 1;
+            let scoretemp: number = this.gate_info['passed_level'];
+            let opendata = wx.getOpenDataContext();
+            opendata.postMessage({type: 'update', score:scoretemp.toString()});
+        }    
+    }
     unlockNextLevel () {
         this.gate_index += 1;
         if (this.gate_info['levels'][this.gate_index] === -1) {
             this.gate_info['levels'][this.gate_index] = 0;
         }
-        
     }
     loadScene () {
         //添加3D场景
@@ -204,6 +213,8 @@ class GameView {
         material_switch_heavy.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_HEAVY_URL);
         const material_switch_split: Laya.StandardMaterial = new Laya.StandardMaterial();
         material_switch_split.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_SPLIT_URL);
+        const material_help: Laya.StandardMaterial = new Laya.StandardMaterial();
+        material_help.diffuseTexture = Laya.Texture2D.load("res/help.png");
         //添加地形
         this.map = new Array<Array<Laya.MeshSprite3D>>();
         for (let i = 0; i < this.MAX_WIDTH; i++) {
@@ -252,6 +263,12 @@ class GameView {
                     case Block.END:
                     //终点
 
+                    break;
+                    case Block.HELP:
+                    //help界面
+                    this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1))) as Laya.MeshSprite3D;
+                    this.map[i][j].transform.position = new Laya.Vector3(i, -1-block_depth/2, j);
+                    this.map[i][j].meshRender.material = material_help;
                     break;
                     default:
                     break;
@@ -832,6 +849,8 @@ class GameView {
             //木板 其次
             //最后 石板
             if (type_1 === Block.LIGHT || type_2 === Block.LIGHT) {
+                name = "trigger";
+            } else if (type_1 === Block.HELP || type_2 === Block.HELP) {
                 name = "trigger";
             } else if (type_1 === Block.IRON) {
                 if (this.getIronInfo(this.cube1_pos_pre.x, this.cube1_pos_pre.z)["state"]) {

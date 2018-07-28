@@ -26,6 +26,7 @@ var Block;
     Block[Block["HEAVY"] = 5] = "HEAVY";
     Block[Block["SPLIT"] = 6] = "SPLIT";
     Block[Block["END"] = 7] = "END";
+    Block[Block["HELP"] = 8] = "HELP";
 })(Block || (Block = {}));
 ;
 var State;
@@ -133,6 +134,7 @@ var GameView = /** @class */ (function () {
     };
     GameView.prototype.loadNext = function () {
         this.clearView();
+        this.updatePassedLevel();
         this.computeScore();
         this.unlockNextLevel();
         this.loadFile();
@@ -144,6 +146,14 @@ var GameView = /** @class */ (function () {
     };
     GameView.prototype.computeScore = function () {
         this.gate_info['levels'][this.gate_index] = 1;
+    };
+    GameView.prototype.updatePassedLevel = function () {
+        if (this.gate_info['levels'][this.gate_index] === 0) {
+            this.gate_info['passed_level'] += 1;
+            var scoretemp = this.gate_info['passed_level'];
+            var opendata = wx.getOpenDataContext();
+            opendata.postMessage({ type: 'update', score: scoretemp.toString() });
+        }
     };
     GameView.prototype.unlockNextLevel = function () {
         this.gate_index += 1;
@@ -176,6 +186,8 @@ var GameView = /** @class */ (function () {
         material_switch_heavy.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_HEAVY_URL);
         var material_switch_split = new Laya.StandardMaterial();
         material_switch_split.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_SPLIT_URL);
+        var material_help = new Laya.StandardMaterial();
+        material_help.diffuseTexture = Laya.Texture2D.load("res/help.png");
         //添加地形
         this.map = new Array();
         for (var i = 0; i < this.MAX_WIDTH; i++) {
@@ -223,6 +235,12 @@ var GameView = /** @class */ (function () {
                         break;
                     case Block.END:
                         //终点
+                        break;
+                    case Block.HELP:
+                        //help界面
+                        this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_help;
                         break;
                     default:
                         break;
@@ -787,6 +805,9 @@ var GameView = /** @class */ (function () {
             //木板 其次
             //最后 石板
             if (type_1 === Block.LIGHT || type_2 === Block.LIGHT) {
+                name = "trigger";
+            }
+            else if (type_1 === Block.HELP || type_2 === Block.HELP) {
                 name = "trigger";
             }
             else if (type_1 === Block.IRON) {

@@ -31,7 +31,8 @@ var myUI;
             this.levels = Laya.loader.getRes(this.levels_file);
             var defaultExist = false;
             var data = [];
-            for (var i = 1; i < this.levels['total_level']; i++) {
+            var i;
+            for (i = 1; i < this.levels['total_level']; i++) {
                 if (!defaultExist && this.levels['levels'][i] === -1) {
                     defaultExist = true;
                     this.parent.setCurrentLevel(i - 1);
@@ -39,6 +40,9 @@ var myUI;
                 data.push([i, this.levels['levels'][i]]);
             }
             this.list.array = data;
+            if (!defaultExist) {
+                this.parent.setCurrentLevel(i - 1);
+            }
         };
         SelectList.prototype.upDateItem = function (cell, index) {
             if (index === this.parent.getCurrentLevel() - 1) {

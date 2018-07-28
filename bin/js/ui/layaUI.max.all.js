@@ -36,7 +36,7 @@ var ui;
             _super.prototype.createChildren.call(this);
             this.createView(ui.game_barUI.uiView);
         };
-        game_barUI.uiView = { "type": "Dialog", "props": { "width": 1334, "top": 0, "left": 0, "height": 300 }, "child": [{ "type": "Button", "props": { "width": 50, "var": "pauseButton", "top": 50, "skin": "pause.png", "left": 50, "height": 50 } }, { "type": "Label", "props": { "width": 300, "var": "movesLabel", "top": 10, "text": "步数：", "left": 200, "height": 30, "fontSize": 30, "font": "Arial", "color": "#ffffff" } }, { "type": "Label", "props": { "width": 300, "var": "timeLabel", "top": 10, "text": "时间：", "left": 600, "height": 30, "fontSize": 30, "font": "Arial", "color": "#ffffff" } }] };
+        game_barUI.uiView = { "type": "Dialog", "props": { "width": 1334, "top": 0, "left": 0, "height": 300 }, "child": [{ "type": "Button", "props": { "width": 50, "var": "pauseButton", "top": 50, "skin": "pause.png", "left": 50, "height": 50 } }, { "type": "Label", "props": { "width": 300, "var": "movesLabel", "top": 10, "text": "步数", "left": 200, "height": 30, "fontSize": 30, "font": "Arial", "color": "#ffffff" } }, { "type": "Label", "props": { "width": 300, "var": "timeLabel", "top": 10, "text": "时间", "left": 600, "height": 30, "fontSize": 30, "font": "Arial", "color": "#ffffff" } }] };
         return game_barUI;
     }(Dialog));
     ui.game_barUI = game_barUI;
@@ -72,6 +72,21 @@ var ui;
     ui.pause_dialogUI = pause_dialogUI;
 })(ui || (ui = {}));
 (function (ui) {
+    var rank_listUI = /** @class */ (function (_super) {
+        __extends(rank_listUI, _super);
+        function rank_listUI() {
+            return _super.call(this) || this;
+        }
+        rank_listUI.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
+            this.createView(ui.rank_listUI.uiView);
+        };
+        rank_listUI.uiView = { "type": "Dialog", "props": { "width": 600, "height": 800, "centerY": 0, "centerX": 0 }, "child": [{ "type": "Button", "props": { "width": 200, "stateNum": 3, "skin": "button.png", "name": "close", "labelSize": 30, "labelFont": "SimHei", "label": "关闭", "height": 50, "centerX": 0, "bottom": 50 } }] };
+        return rank_listUI;
+    }(Dialog));
+    ui.rank_listUI = rank_listUI;
+})(ui || (ui = {}));
+(function (ui) {
     var select_listUI = /** @class */ (function (_super) {
         __extends(select_listUI, _super);
         function select_listUI() {
@@ -96,7 +111,7 @@ var ui;
             _super.prototype.createChildren.call(this);
             this.createView(ui.start_viewUI.uiView);
         };
-        start_viewUI.uiView = { "type": "View", "props": { "width": 1334, "name": "start", "height": 750 }, "child": [{ "type": "Button", "props": { "width": 120, "visible": true, "var": "leftButton", "stateNum": 2, "skin": "arrow_large_4.png", "rotation": 45, "pivotY": 60, "pivotX": 59, "mouseEnabled": true, "left": 50, "height": 120, "bottom": 20 } }, { "type": "Button", "props": { "width": 120, "var": "downButton", "stateNum": 2, "skin": "arrow_large_3.png", "rotation": -45, "right": 50, "pivotY": 60, "pivotX": 61, "mouseEnabled": true, "height": 120, "bottom": 20 } }, { "type": "Button", "props": { "width": 120, "visible": true, "var": "rightButton", "stateNum": 2, "skin": "arrow_large_1.png", "rotation": -45, "right": 50, "pivotY": 60, "pivotX": 59, "mouseEnabled": true, "height": 120, "bottom": 240 } }, { "type": "Button", "props": { "width": 120, "visible": true, "var": "upButton", "stateNum": 2, "skin": "arrow_large_2.png", "rotation": 45, "pivotY": 59, "pivotX": 60, "mouseEnabled": true, "left": 50, "height": 120, "bottom": 240 } }] };
+        start_viewUI.uiView = { "type": "View", "props": { "width": 1334, "name": "start", "height": 750 }, "child": [{ "type": "Button", "props": { "width": 120, "visible": true, "var": "leftButton", "stateNum": 2, "skin": "arrow_large_4.png", "rotation": 0, "mouseEnabled": true, "left": 50, "height": 120, "bottom": 20 } }, { "type": "Button", "props": { "width": 120, "var": "downButton", "stateNum": 2, "skin": "arrow_large_3.png", "rotation": 0, "right": 50, "mouseEnabled": true, "height": 120, "bottom": 20 } }, { "type": "Button", "props": { "width": 120, "visible": true, "var": "rightButton", "stateNum": 2, "skin": "arrow_large_1.png", "rotation": 0, "right": 50, "mouseEnabled": true, "height": 120, "bottom": 240 } }, { "type": "Button", "props": { "width": 120, "visible": true, "var": "upButton", "stateNum": 2, "skin": "arrow_large_2.png", "rotation": 0, "mouseEnabled": true, "left": 50, "height": 120, "bottom": 240 } }, { "type": "Button", "props": { "width": 120, "var": "ranklistButton", "top": 10, "stateNum": 3, "skin": "button.png", "left": 10, "labelSize": 30, "labelFont": "SimHei", "label": "排行榜", "height": 50 } }] };
         return start_viewUI;
     }(View));
     ui.start_viewUI = start_viewUI;

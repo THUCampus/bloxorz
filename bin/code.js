@@ -95895,6 +95895,287 @@ if (typeof define === 'function' && define.amd){
         }
     });
 }
+var Page;
+(function (Page) {
+    Page[Page["Start"] = 0] = "Start";
+    Page[Page["Help"] = 1] = "Help";
+    Page[Page["Select"] = 2] = "Select";
+    Page[Page["Game"] = 3] = "Game";
+})(Page || (Page = {}));
+;
+var MenuView = /** @class */ (function () {
+    function MenuView() {
+        var res = [{ url: "arrow_large_1.png", type: Laya.Loader.IMAGE },
+            { url: "arrow_large_2.png", type: Laya.Loader.IMAGE },
+            { url: "arrow_large_3.png", type: Laya.Loader.IMAGE },
+            { url: "arrow_large_4.png", type: Laya.Loader.IMAGE },
+            { url: "pause.png", type: Laya.Loader.IMAGE },
+            { url: "button.png", type: Laya.Loader.IMAGE },
+            { url: "btn_close.png", type: Laya.Loader.IMAGE },
+            { url: "sound/bgm.mp3", type: Laya.Loader.SOUND }];
+        this.login();
+        Laya.loader.load(res, Laya.Handler.create(this, this.loadUI), null);
+    }
+    MenuView.prototype.login = function () {
+        this.opendata = wx.getOpenDataContext();
+        this.opendata.postMessage({ type: 'init' });
+    };
+    MenuView.prototype.loadUI = function () {
+        //加载各个界面
+        this.loadStartPage();
+        this.loadLogo();
+        this.loadHelp();
+        this.loadSelect();
+        this.loadGameBar();
+        this.loadPause();
+        //添加主界面
+        this.pageState = Page.Start;
+        this.addStartPage();
+        //播放BGM
+        this.playBGM();
+    };
+    /**加载各个界面 代码块开始 */
+    MenuView.prototype.loadStartPage = function () {
+        //加载主界面
+        this.startPage = new ui.start_viewUI();
+        //绑定按钮监听函数
+        this.startPage.upButton.on(Laya.Event.MOUSE_DOWN, this, this.upButtonClicked);
+        this.startPage.downButton.on(Laya.Event.MOUSE_DOWN, this, this.downButtonCLicked);
+        this.startPage.leftButton.on(Laya.Event.MOUSE_DOWN, this, this.leftButtonClicked);
+        this.startPage.rightButton.on(Laya.Event.MOUSE_DOWN, this, this.rightButtonClicked);
+        this.startPage.ranklistButton.on(Laya.Event.MOUSE_DOWN, this, this.loadRankList);
+    };
+    MenuView.prototype.loadLogo = function () {
+        //加载主界面的logo
+        this.logo = new ui.logoUI();
+    };
+    MenuView.prototype.loadHelp = function () {
+        //加载帮助界面
+    };
+    MenuView.prototype.loadSelect = function () {
+        //加载选择界面
+        this.selectList = new myUI.SelectList(this);
+    };
+    MenuView.prototype.loadGameBar = function () {
+        //加载游戏顶部工具条
+        this.gameBar = new ui.game_barUI();
+        this.gameBar.pauseButton.on(Laya.Event.MOUSE_DOWN, this, this.addPause);
+    };
+    MenuView.prototype.loadPause = function () {
+        //加载暂停界面
+        this.pause = new ui.pause_dialogUI();
+        this.pause.backToGame.on(Laya.Event.MOUSE_DOWN, this, this.pauseToGame);
+        this.pause.backToMain.on(Laya.Event.MOUSE_DOWN, this, this.pauseToStart);
+    };
+    MenuView.prototype.loadRankList = function () {
+        //加载排行榜界面
+        this.ranklist = new view.rankList();
+        this.ranklist.draw();
+        Laya.stage.addChild(this.ranklist);
+    };
+    MenuView.prototype.updateSelect = function () {
+        //重新加载选关信息
+        //this.selectList.update();
+    };
+    MenuView.prototype.playBGM = function () {
+        Laya.SoundManager.playMusic("sound/bgm.mp3", 0);
+    };
+    /**加载各个界面 代码块结束 */
+    /**添加各个界面 代码块开始 */
+    MenuView.prototype.addStartPage = function () {
+        Laya.stage.addChild(this.startPage);
+        //添加3D画面
+        this.addGame(0);
+        //添加logo
+        this.addLogo();
+    };
+    MenuView.prototype.addLogo = function () {
+        //添加主界面的logo
+        Laya.stage.addChild(this.logo);
+    };
+    MenuView.prototype.addHelp = function () {
+        //添加帮助界面
+    };
+    MenuView.prototype.addSelect = function () {
+        //添加选择界面
+        Laya.stage.addChild(this.selectList.selectListUI);
+    };
+    MenuView.prototype.addGame = function (index) {
+        //添加游戏界面
+        this.gameView = new GameView(index, this);
+    };
+    MenuView.prototype.addGameBar = function () {
+        //加载游戏顶部工具条
+        Laya.stage.addChild(this.gameBar);
+    };
+    MenuView.prototype.addPause = function () {
+        //加载暂停界面
+        Laya.stage.addChild(this.pause);
+    };
+    /**添加各个界面 代码块结束 */
+    /**移除各个界面 代码块开始 */
+    MenuView.prototype.removeLogo = function () {
+        //移除logo
+        Laya.stage.removeChild(this.logo);
+    };
+    MenuView.prototype.removeHelp = function () {
+        //移除帮助
+        //Laya.stage.removeChild()
+    };
+    MenuView.prototype.removeSelect = function () {
+        //移除选关
+        Laya.stage.removeChild(this.selectList.selectListUI);
+        //Laya.stage.removeChild(this.selectList2);
+    };
+    MenuView.prototype.removeGame = function () {
+        //移除游戏界面
+        this.gameView.clearView();
+        delete this.gameView;
+    };
+    MenuView.prototype.removeGameBar = function () {
+        //移除游戏顶部工具条
+        Laya.stage.removeChild(this.gameBar);
+    };
+    MenuView.prototype.removePause = function () {
+        //移除暂停界面
+        Laya.stage.removeChild(this.pause);
+    };
+    /**移除各个界面 代码块结束 */
+    /**界面跳转 代码块开始 */
+    MenuView.prototype.startToHelp = function () {
+        this.removeLogo();
+        this.pageState = Page.Help;
+        this.addHelp();
+    };
+    MenuView.prototype.helpToStart = function () {
+        this.removeHelp();
+        this.pageState = Page.Start;
+        this.addLogo();
+    };
+    MenuView.prototype.startToSelect = function () {
+        this.removeLogo();
+        this.pageState = Page.Select;
+        this.addSelect();
+    };
+    MenuView.prototype.selectToStart = function () {
+        this.removeSelect();
+        this.pageState = Page.Start;
+        this.addLogo();
+    };
+    MenuView.prototype.selectToGame = function (index) {
+        this.removeSelect();
+        this.pageState = Page.Game;
+        this.addGameBar();
+    };
+    MenuView.prototype.pauseToGame = function () {
+        this.removePause();
+    };
+    MenuView.prototype.pauseToStart = function () {
+        this.removePause();
+        this.removeGame();
+        this.removeGameBar();
+        this.pageState = Page.Start;
+        this.addStartPage();
+    };
+    /**界面跳转 代码块结束 */
+    /**按钮监听函数 代码块开始 */
+    MenuView.prototype.upButtonClicked = function () {
+        this.gameView.addMessage(Operation.UP);
+        switch (this.pageState) {
+            case Page.Start:
+                this.startToHelp();
+                break;
+            case Page.Help:
+                this.helpToStart();
+                break;
+            case Page.Select:
+                this.selectToStart();
+                break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+                break;
+            default:
+                console.log("no such page");
+                break;
+        }
+    };
+    MenuView.prototype.downButtonCLicked = function () {
+        this.gameView.addMessage(Operation.DOWN);
+        switch (this.pageState) {
+            case Page.Start:
+                break;
+            case Page.Help:
+                this.helpToStart();
+                break;
+            case Page.Select:
+                this.selectToStart();
+                break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+                break;
+            default:
+                console.log("no such page");
+                break;
+        }
+    };
+    MenuView.prototype.leftButtonClicked = function () {
+        this.gameView.addMessage(Operation.LEFT);
+        switch (this.pageState) {
+            case Page.Start:
+                break;
+            case Page.Help:
+                this.helpToStart();
+                break;
+            case Page.Select:
+                this.selectToStart();
+                break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+                break;
+            default:
+                console.log("no such page");
+                break;
+        }
+    };
+    MenuView.prototype.rightButtonClicked = function () {
+        this.gameView.addMessage(Operation.RIGHT);
+        switch (this.pageState) {
+            case Page.Start:
+                this.startToSelect();
+                break;
+            case Page.Help:
+                this.helpToStart();
+                break;
+            case Page.Select:
+                this.selectToGame(this.currentLevel);
+                break;
+            case Page.Game:
+                this.stepcount += 1;
+                this.setMovesCount();
+                break;
+            default:
+                console.log("no such page");
+                break;
+        }
+    };
+    /**按钮监听函数 代码块结束 */
+    MenuView.prototype.setCurrentLevel = function (index) {
+        this.currentLevel = index;
+    };
+    MenuView.prototype.getCurrentLevel = function () {
+        return this.currentLevel;
+    };
+    MenuView.prototype.setMovesCount = function () {
+        this.gameBar.movesLabel.text = "步数: " + this.stepcount;
+    };
+    return MenuView;
+}());
+//# sourceMappingURL=menuView.js.map
+//view.ts负责游戏中的所有的元素显示、运动效果和与此相关的部分逻辑
+//GameView类的一个实例对象就是一个游戏关卡
 var Direction;
 (function (Direction) {
     Direction[Direction["UP"] = 0] = "UP";
@@ -95919,8 +96200,9 @@ var Block;
     Block[Block["MUBAN"] = 3] = "MUBAN";
     Block[Block["LIGHT"] = 4] = "LIGHT";
     Block[Block["HEAVY"] = 5] = "HEAVY";
-    Block[Block["FLASH"] = 6] = "FLASH";
+    Block[Block["SPLIT"] = 6] = "SPLIT";
     Block[Block["END"] = 7] = "END";
+    Block[Block["HELP"] = 8] = "HELP";
 })(Block || (Block = {}));
 ;
 var State;
@@ -95930,60 +96212,160 @@ var State;
     State[State["FAILURE"] = 2] = "FAILURE";
 })(State || (State = {}));
 ;
+//一些常数
+var block_depth = 0.1; //地块厚度
+var millisec = 10; //计时器间隔
 var GameView = /** @class */ (function () {
-    function GameView(gate_file) {
-        //初始化引擎
-        //Laya3D.init(0, 0, true);
-        //适配模式
-        //Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-        //Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-        //开启统计信息
-        //Laya.Stat.show();
-        //添加3D场景
-        this.scene = Laya.stage.addChild(new Laya.Scene());
-        //添加照相机
-        var camera = (this.scene.addChild(new Laya.Camera(0, 0.1, 100)));
-        camera.transform.translate(new Laya.Vector3(-5, 6, 20));
-        camera.transform.rotate(new Laya.Vector3(-5, -30, 0), true, false);
-        camera.clearColor = null;
-        /*
-                //添加方向光
-                let directionLight: Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-                directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
-                directionLight.direction = new Laya.Vector3(1, -1, 0);
-        */
+    function GameView(gate_index, parent) {
+        //构造函数
+        this.parent = parent;
         //初始化类成员变量
+        this.gate_index = gate_index;
+        this.loadFile();
+    }
+    GameView.prototype.indexToString = function (gate_index) {
+        var gate_file = 'res/map_' + gate_index.toString() + '.json';
+        return gate_file;
+    };
+    /**loadView加载场景内容相关函数 代码块开始 */
+    GameView.prototype.loadFile = function () {
         this.messageQueue = new Array();
         this.messageBusy = false;
-        Laya.loader.load(gate_file, Laya.Handler.create(this, this.loadView, [gate_file]), null, Laya.Loader.JSON);
-    }
+        this.canOperate = false;
+        this.parent.stepcount = 0;
+        this.parent.setMovesCount();
+        //调用loadView函数加载场景内容
+        var gate_file = this.indexToString(this.gate_index);
+        var levels_file = 'res/levels.json';
+        var res = [{ url: gate_file, type: Laya.Loader.JSON },
+            { url: levels_file, type: Laya.Loader.JSON }];
+        Laya.loader.load(res, Laya.Handler.create(this, this.loadGateInfo, [gate_file, levels_file]), null);
+    };
+    GameView.prototype.loadGateInfo = function (gate_file, levels_file) {
+        //读取关卡进度文件
+        this.gate_info = Laya.loader.getRes(levels_file);
+        if (this.gate_info['levels'][this.gate_index] !== -1) {
+            this.loadView(gate_file);
+        }
+        else {
+            console.log("this gate is not valiable");
+        }
+    };
     GameView.prototype.loadView = function (gate_file) {
-        //一些常数
-        this.light_height = 3;
-        var block_depth = 0.1;
         //读取关卡文件
         var json_info = Laya.Loader.getRes(gate_file);
+        Laya.Loader.clearRes(gate_file);
         //初始化类成员变量
-        this.MAX_LENGTH = json_info["map_width"];
-        this.MAX_WIDTH = json_info["map_length"];
-        var BLOCK_URL = json_info["url_block"];
-        var BLOCK_IRON_URL = json_info["url_iron"];
-        var BLOCK_MUBAN_URL = json_info["url_muban"];
-        var CUBE_URL = json_info["url_cube"];
-        var material_block = new Laya.StandardMaterial();
-        material_block.diffuseTexture = Laya.Texture2D.load(BLOCK_URL);
-        var material_iron = new Laya.StandardMaterial();
-        material_iron.diffuseTexture = Laya.Texture2D.load(BLOCK_IRON_URL);
-        var material_muban = new Laya.StandardMaterial();
-        material_muban.diffuseTexture = Laya.Texture2D.load(BLOCK_MUBAN_URL);
-        this.map_info = json_info["map"];
-        this.map = new Array();
+        this.camera_pos = new Laya.Vector3(json_info["camera_pos"][0], json_info["camera_pos"][1], json_info["camera_pos"][2]);
+        //灯光
         this.light_range = 3;
+        this.light_height = 3;
+        this.light_global_on = json_info["light_on"];
+        //资源url
+        this.BLOCK_URL = json_info["url_block"];
+        this.BLOCK_IRON_URL = json_info["url_iron"];
+        this.BLOCK_MUBAN_URL = json_info["url_muban"];
+        this.CUBE_URL = json_info["url_cube"];
+        this.BLOCK_SWITCH_LIGHT_URL = json_info["url_switch_light"];
+        this.BLOCK_SWITCH_HEAVY_URL = json_info["url_switch_heavy"];
+        this.BLOCK_SWITCH_SPLIT_URL = json_info["url_switch_split"];
+        //地图
+        this.map_info = json_info["map"];
+        this.MAX_LENGTH = json_info["map_length"]; //上下
+        this.MAX_WIDTH = json_info["map_width"]; //左右 
         this.start_pos = json_info["startpos"];
-        var cube_pos_init = new Laya.Vector3(this.start_pos[0], 0, this.start_pos[1]);
-        this.cube1_pos = new Laya.Vector3(cube_pos_init.x, cube_pos_init.y, cube_pos_init.z);
-        this.cube2_pos = new Laya.Vector3(cube_pos_init.x, cube_pos_init.y + 1, cube_pos_init.z);
+        //机关
+        this.switch_info = json_info["triggers"];
+        this.iron_list = json_info["iron_list"];
+        //元素位置信息
+        this.cube_pos_init = new Laya.Vector3(this.start_pos[1], 0, this.start_pos[0]);
+        this.cube1_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y, this.cube_pos_init.z);
+        this.cube2_pos = new Laya.Vector3(this.cube_pos_init.x, this.cube_pos_init.y + 1, this.cube_pos_init.z);
+        this.load();
+    };
+    GameView.prototype.load = function () {
+        this.loadScene();
+        //加入各元素
+        if (this.light_global_on) {
+            this.loadDirectionLight();
+        }
+        else {
+            this.loadSpotLight();
+        }
+        this.loadMap();
+        this.loadCube();
+        this.loadSelfLight();
+        this.updateLightPos();
+    };
+    GameView.prototype.clearView = function () {
+        this.messageQueue = new Array();
+        this.messageBusy = false;
+        this.canOperate = false;
+        //移除各元素
+        Laya.stage.removeChild(this.scene);
+    };
+    GameView.prototype.reload = function () {
+        this.clearView();
+        this.loadFile();
+    };
+    GameView.prototype.loadNext = function () {
+        this.clearView();
+        this.updatePassedLevel();
+        this.computeScore();
+        this.unlockNextLevel();
+        this.loadFile();
+    };
+    GameView.prototype.loadSelected = function (index) {
+        this.clearView();
+        this.gate_index = index;
+        this.loadFile();
+    };
+    GameView.prototype.computeScore = function () {
+        this.gate_info['levels'][this.gate_index] = 1;
+    };
+    GameView.prototype.updatePassedLevel = function () {
+        if (this.gate_info['levels'][this.gate_index] === 0) {
+            this.gate_info['passed_level'] += 1;
+            var scoretemp = this.gate_info['passed_level'];
+            var opendata = wx.getOpenDataContext();
+            opendata.postMessage({ type: 'update', score: scoretemp.toString() });
+        }
+    };
+    GameView.prototype.unlockNextLevel = function () {
+        this.gate_index += 1;
+        if (this.gate_info['levels'][this.gate_index] === -1) {
+            this.gate_info['levels'][this.gate_index] = 0;
+        }
+    };
+    GameView.prototype.loadScene = function () {
+        //添加3D场景
+        this.scene = Laya.stage.addChild(new Laya.Scene());
+        this.scene.zOrder = -1;
+        //添加照相机
+        var camera = (this.scene.addChild(new Laya.Camera(0, 0.1, 100)));
+        camera.transform.translate(this.camera_pos);
+        camera.transform.rotate(new Laya.Vector3(-30, -20, 0), true, false);
+        camera.clearColor = null;
+        camera.orthographic = true;
+    };
+    GameView.prototype.loadMap = function () {
+        //地块材质
+        var material_block = new Laya.StandardMaterial();
+        material_block.diffuseTexture = Laya.Texture2D.load(this.BLOCK_URL);
+        var material_iron = new Laya.StandardMaterial();
+        material_iron.diffuseTexture = Laya.Texture2D.load(this.BLOCK_IRON_URL);
+        var material_muban = new Laya.StandardMaterial();
+        material_muban.diffuseTexture = Laya.Texture2D.load(this.BLOCK_MUBAN_URL);
+        var material_switch_light = new Laya.StandardMaterial();
+        material_switch_light.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_LIGHT_URL);
+        var material_switch_heavy = new Laya.StandardMaterial();
+        material_switch_heavy.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_HEAVY_URL);
+        var material_switch_split = new Laya.StandardMaterial();
+        material_switch_split.diffuseTexture = Laya.Texture2D.load(this.BLOCK_SWITCH_SPLIT_URL);
+        var material_help = new Laya.StandardMaterial();
+        material_help.diffuseTexture = Laya.Texture2D.load("res/help.png");
         //添加地形
+        this.map = new Array();
         for (var i = 0; i < this.MAX_WIDTH; i++) {
             this.map[i] = new Array();
             for (var j = 0; j < this.MAX_LENGTH; j++) {
@@ -95994,116 +96376,143 @@ var GameView = /** @class */ (function () {
                     case Block.ORDINARY:
                         //普通地块
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, block_depth)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
                         this.map[i][j].meshRender.material = material_block;
                         break;
                     case Block.IRON:
                         //机关地块
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
                         this.map[i][j].meshRender.material = material_iron;
                         break;
                     case Block.MUBAN:
                         //木地块
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
                         this.map[i][j].meshRender.material = material_muban;
                         break;
                     case Block.LIGHT:
                         //轻压机关
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
-                        this.map[i][j].meshRender.material = material_block;
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_switch_light;
                         break;
                     case Block.HEAVY:
                         //重压机关
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
-                        this.map[i][j].meshRender.material = material_block;
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_switch_heavy;
                         break;
-                    case Block.FLASH:
+                    case Block.SPLIT:
                         //分身机关
                         this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
-                        this.map[i][j].transform.translate(new Laya.Vector3(i, -1 - block_depth / 2, j), true);
-                        this.map[i][j].meshRender.material = material_block;
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_switch_split;
                         break;
                     case Block.END:
                         //终点
+                        break;
+                    case Block.HELP:
+                        //help界面
+                        this.map[i][j] = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 0.1)));
+                        this.map[i][j].transform.position = new Laya.Vector3(i, -1 - block_depth / 2, j);
+                        this.map[i][j].meshRender.material = material_help;
                         break;
                     default:
                         break;
                 }
             }
         }
+        this.setTriggers();
+    };
+    GameView.prototype.loadCube = function () {
         //cube
         this.cube = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1, 1, 2)));
-        this.cube.transform.translate(cube_pos_init); //初始位置  
         var material_cube = new Laya.StandardMaterial();
-        material_cube.diffuseTexture = Laya.Texture2D.load(CUBE_URL); //贴纸
+        material_cube.diffuseTexture = Laya.Texture2D.load(this.CUBE_URL); //贴纸
         material_cube.albedo = new Laya.Vector4(6, 6, 6, 0.9); //透明效果
         material_cube.renderMode = Laya.StandardMaterial.RENDERMODE_DEPTHREAD_TRANSPARENTDOUBLEFACE;
         this.cube.meshRender.material = material_cube;
+        var fall_height = 10;
+        this.cube.transform.position = new Laya.Vector3(this.cube_pos_init.x, fall_height, this.cube_pos_init.z); //初始位置 
+        this.fall_in(fall_height);
+    };
+    GameView.prototype.loadSelfLight = function () {
         //自发光
         this.light = this.scene.addChild(new Laya.PointLight());
-        this.light.transform.translate(cube_pos_init);
         this.light.range = this.light_range;
-        this.light.attenuation = new Laya.Vector3(0.4, 0.4, 0.4); //衰减效果
+        this.light.attenuation = new Laya.Vector3(1, 1, 1); //衰减效果
+    };
+    GameView.prototype.loadSpotLight = function () {
         //范围聚光
         this.spotLight = this.scene.addChild(new Laya.SpotLight());
-        this.spotLight.transform.position = new Laya.Vector3(this.light.transform.position.x, this.light_height, this.light.transform.position.z);
         this.spotLight.direction = new Laya.Vector3(0, -1, 0);
         this.spotLight.range = 100;
         this.spotLight.spot = 12;
         this.spotLight.attenuation = new Laya.Vector3(0.01, 0.01, 0.01);
     };
+    GameView.prototype.loadDirectionLight = function () {
+        //添加方向光
+        this.directionLight = this.scene.addChild(new Laya.DirectionLight());
+        this.directionLight.color = new Laya.Vector3(2, 2, 2);
+        this.directionLight.direction = new Laya.Vector3(0.8, -1, -1.7);
+    };
+    /**loadView加载场景内容相关函数 代码块结束 */
+    /**cube动作相关接口函数 代码块开始 目前12个动作 */
     GameView.prototype.moveUp = function () {
         var up_pivot = new Laya.Vector3((this.cube1_pos.x + this.cube2_pos.x) / 2, -1, Math.min(this.cube1_pos.z, this.cube2_pos.z) - 0.5);
         this.lastMove = Direction.UP;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, up_pivot, new Laya.Vector3(-90, 0, 0));
+        this.makeSound();
         this.moveAni(up_pivot, new Laya.Vector3(-10, 0, 0), 9); //异步的
     };
     GameView.prototype.moveDown = function () {
         var down_pivot = new Laya.Vector3((this.cube1_pos.x + this.cube2_pos.x) / 2, -1, Math.max(this.cube1_pos.z, this.cube2_pos.z) + 0.5);
         this.lastMove = Direction.DOWN;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, down_pivot, new Laya.Vector3(90, 0, 0));
+        this.makeSound();
         this.moveAni(down_pivot, new Laya.Vector3(10, 0, 0), 9); //异步的
     };
     GameView.prototype.moveLeft = function () {
         var left_pivot = new Laya.Vector3(Math.min(this.cube1_pos.x, this.cube2_pos.x) - 0.5, -1, (this.cube1_pos.z + this.cube2_pos.z) / 2);
         this.lastMove = Direction.LEFT;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, left_pivot, new Laya.Vector3(0, 0, 90));
+        this.makeSound();
         this.moveAni(left_pivot, new Laya.Vector3(0, 0, 10), 9); //异步的
     };
     GameView.prototype.moveRight = function () {
         var right_pivot = new Laya.Vector3(Math.max(this.cube1_pos.x, this.cube2_pos.x) + 0.5, -1, (this.cube1_pos.z + this.cube2_pos.z) / 2);
         this.lastMove = Direction.RIGHT;
+        this.center_pos_pre = this.myPointRotate(this.cube.transform.position, right_pivot, new Laya.Vector3(0, 0, -90));
+        this.makeSound();
         this.moveAni(right_pivot, new Laya.Vector3(0, 0, -10), 9); //异步的
     };
     GameView.prototype.fallUp = function () {
-        this.fallAni(new Laya.Vector3(-10, 0, 0), 9); //异步的
+        this.fallAni(new Laya.Vector3(-10, 0, 0), 27); //异步的
     };
     GameView.prototype.fallDown = function () {
-        this.fallAni(new Laya.Vector3(10, 0, 0), 9); //异步的
+        this.fallAni(new Laya.Vector3(10, 0, 0), 27); //异步的
     };
     GameView.prototype.fallLeft = function () {
-        this.fallAni(new Laya.Vector3(0, 0, 10), 9); //异步的
+        this.fallAni(new Laya.Vector3(0, 0, 10), 27); //异步的
     };
     GameView.prototype.fallRight = function () {
-        this.fallAni(new Laya.Vector3(0, 0, -10), 9); //异步的
+        this.fallAni(new Laya.Vector3(0, 0, -10), 27); //异步的
     };
     GameView.prototype.fallUp_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(-10, 0, 0), 9);
-        this.fallAni(new Laya.Vector3(-10, 0, 0), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(-10, 0, 0), 9);
     };
     GameView.prototype.fallDown_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(10, 0, 0), 9);
-        this.fallAni(new Laya.Vector3(10, 0, 0), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(10, 0, 0), 9);
     };
     GameView.prototype.fallLeft_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(0, 0, 10), 9);
-        this.fallAni(new Laya.Vector3(0, 0, 10), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(0, 0, 10), 9);
     };
     GameView.prototype.fallRight_half = function (pivot) {
-        this.moveAni(pivot, new Laya.Vector3(0, 0, -10), 9);
-        this.fallAni(new Laya.Vector3(0, 0, -10), 9); //异步的
+        this.fallHalfAni(pivot, new Laya.Vector3(0, 0, -10), 9);
     };
+    /**cube动作相关接口函数 代码块结束 */
+    /**cube动作接口函数调用的动画函数 代码块开始 */
     GameView.prototype.moveAni = function (pivotVector, rotateVector, times) {
         var _this = this;
         //异步的
@@ -96111,17 +96520,15 @@ var GameView = /** @class */ (function () {
         var newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(function () {
-            _this.myRotate(pivotVector, rotateVector);
+            _this.doRotate(pivotVector, rotateVector);
             count++;
             if (count >= times) {
                 //旋转90度调用回调函数
                 clearInterval(newTimer);
                 _this.updateCubePos();
-                if (_this.checkFall() === State.GAMING) {
-                    _this.checkMessageQueue();
-                }
+                _this.checkState();
             }
-        }, 1);
+        }, millisec);
     };
     GameView.prototype.fallAni = function (rotateVector, times) {
         var _this = this;
@@ -96134,54 +96541,163 @@ var GameView = /** @class */ (function () {
             count++;
             if (count >= times) {
                 clearInterval(newTimer);
-                _this.updateCubePos();
                 //游戏失败的处理
                 console.log("fail");
+                _this.restart();
             }
-        }, 1);
+        }, millisec);
     };
-    GameView.prototype.fallStraightAni = function (times) {
+    GameView.prototype.fallHalfAni = function (pivotVector, rotateVector, times) {
         var _this = this;
         //异步的
         var count = 0;
         var newTimer = null;
         clearInterval(newTimer);
         newTimer = setInterval(function () {
-            _this.cube.transform.position.y -= 0.2;
+            _this.doRotate(pivotVector, rotateVector);
+            count++;
+            if (count >= times) {
+                //旋转90度调用回调函数
+                clearInterval(newTimer);
+                _this.updateCubePos();
+                _this.fallAni(rotateVector, 27); //异步的
+            }
+        }, millisec);
+    };
+    GameView.prototype.fallStraightWinAni = function (rate, times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doFallStraight(rate);
             count++;
             if (count >= times) {
                 clearInterval(newTimer);
-                _this.updateCubePos();
                 //游戏胜利的处理
                 console.log("success");
-                //advance 红木时游戏失败的处理
+                if (_this.gate_index === 0) {
+                    _this.loadSelected(_this.parent.getCurrentLevel());
+                }
+                else {
+                    _this.goToNext();
+                }
             }
-        }, 1);
+        }, millisec);
     };
+    GameView.prototype.fallStraightLoseAni = function (block, rate, times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doFallStraight(rate);
+            _this.doFallBlock(block, rate + 0.1);
+            count++;
+            if (count >= times) {
+                clearInterval(newTimer);
+                //红木掉落的处理
+                console.log("red");
+                _this.restart();
+            }
+        }, millisec);
+    };
+    GameView.prototype.fallInAni = function (rate, times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doFallStraight(rate);
+            count++;
+            if (count >= times) {
+                clearInterval(newTimer);
+                _this.canOperate = true;
+            }
+        }, millisec);
+    };
+    GameView.prototype.restartAni = function (times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doDark();
+            count++;
+            if (count >= times) {
+                clearInterval(newTimer);
+                _this.reload();
+            }
+        }, millisec);
+    };
+    /**cube动作接口函数调用的动画函数 代码块结束 */
+    /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块开始 */
     GameView.prototype.doFall = function (pivotVector, rotateVector) {
-        this.myRotate(pivotVector, rotateVector);
-        this.cube.transform.position.y -= 0.5;
+        this.myRotate(this.cube, pivotVector, rotateVector);
+        this.myFallStraight(this.cube, 0.5);
+        this.updateLightPos();
     };
-    GameView.prototype.myRotate = function (pivotVector, rotateVector) {
+    GameView.prototype.doRotate = function (pivotVector, rotateVector) {
+        this.myRotate(this.cube, pivotVector, rotateVector);
+        this.updateLightPos();
+    };
+    GameView.prototype.doFallStraight = function (rate) {
+        this.myFallStraight(this.cube, rate);
+        this.updateLightPos();
+    };
+    GameView.prototype.doFallBlock = function (block, rate) {
+        this.myFallStraight(block, rate);
+    };
+    GameView.prototype.doDark = function () {
+        if (!this.light_global_on) {
+            this.spotLight.attenuation = new Laya.Vector3(this.spotLight.attenuation.x, this.spotLight.attenuation.y + 0.03, this.spotLight.attenuation.z);
+        }
+        if (this.light_global_on) {
+            this.directionLight.color = new Laya.Vector3(this.directionLight.color.x - 0.05, this.directionLight.color.y - 0.05, this.directionLight.color.z - 0.05);
+        }
+    };
+    /**cube动作接口函数调用的动画函数调用的分解动作函数 代码块结束 */
+    /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块开始 */
+    GameView.prototype.myFallStraight = function (item, rate) {
+        item.transform.position = new Laya.Vector3(item.transform.position.x, item.transform.position.y - rate, item.transform.position.z);
+    };
+    GameView.prototype.myRotate = function (item, pivotVector, rotateVector) {
         //Laya的旋转机制有毒 自己写了cube旋转函数 支持翻转
         //pivotVector 是旋转轴
         //rotateVector 是旋转方向及角度
         var quaternion = new Laya.Quaternion();
         Laya.Quaternion.createFromYawPitchRoll(rotateVector.y / 180 * Math.PI, rotateVector.x / 180 * Math.PI, rotateVector.z / 180 * Math.PI, quaternion);
         //cube
-        this.cube.transform.rotate(rotateVector, false, false);
-        var oldposition_cube = new Laya.Vector3(this.cube.transform.position.x - pivotVector.x, this.cube.transform.position.y - pivotVector.y, this.cube.transform.position.z - pivotVector.z);
-        var newposition_cube = new Laya.Vector3();
-        Laya.Vector3.transformQuat(oldposition_cube, quaternion, newposition_cube);
-        this.cube.transform.position = new Laya.Vector3(newposition_cube.x + pivotVector.x, newposition_cube.y + pivotVector.y, newposition_cube.z + pivotVector.z);
-        this.updateLightPos();
+        item.transform.rotate(rotateVector, false, false);
+        var oldposition_item = new Laya.Vector3(item.transform.position.x - pivotVector.x, item.transform.position.y - pivotVector.y, item.transform.position.z - pivotVector.z);
+        var newposition_item = new Laya.Vector3();
+        Laya.Vector3.transformQuat(oldposition_item, quaternion, newposition_item);
+        item.transform.position = new Laya.Vector3(newposition_item.x + pivotVector.x, newposition_item.y + pivotVector.y, newposition_item.z + pivotVector.z);
+    };
+    GameView.prototype.myPointRotate = function (position, pivotVector, rotateVector) {
+        //Laya的旋转机制有毒 自己写了点的位置的旋转函数
+        //pivotVector 是旋转轴
+        //rotateVector 是旋转方向及角度
+        var quaternion = new Laya.Quaternion();
+        Laya.Quaternion.createFromYawPitchRoll(rotateVector.y / 180 * Math.PI, rotateVector.x / 180 * Math.PI, rotateVector.z / 180 * Math.PI, quaternion);
+        //point
+        var oldposition = new Laya.Vector3(position.x - pivotVector.x, position.y - pivotVector.y, position.z - pivotVector.z);
+        var newposition = new Laya.Vector3();
+        Laya.Vector3.transformQuat(oldposition, quaternion, newposition);
+        return new Laya.Vector3(newposition.x + pivotVector.x, newposition.y + pivotVector.y, newposition.z + pivotVector.z);
     };
     GameView.prototype.updateLightPos = function () {
         //更新灯光位置
         //自发光
         this.light.transform.position = this.cube.transform.position;
         //视野聚光
-        this.spotLight.transform.position = new Laya.Vector3(this.light.transform.position.x, this.light_height, this.light.transform.position.z);
+        if (!this.light_global_on) {
+            this.spotLight.transform.position = new Laya.Vector3(this.light.transform.position.x, this.light_height, this.light.transform.position.z);
+        }
     };
     GameView.prototype.updateCubePos = function () {
         //四舍五入修正坐标 尚未矫正偏角 不过实际效果偏角误差观察不出
@@ -96210,7 +96726,36 @@ var GameView = /** @class */ (function () {
             console.log("updateCubePos需要异常处理！");
         }
     };
+    GameView.prototype.updateCubePosPre = function () {
+        //四舍五入修正坐标 尚未矫正偏角 不过实际效果偏角误差观察不出
+        var cube_x = Math.round(this.center_pos_pre.x * 2) / 2;
+        var cube_y = Math.round(this.center_pos_pre.y * 2) / 2;
+        var cube_z = Math.round(this.center_pos_pre.z * 2) / 2;
+        this.center_pos_pre = new Laya.Vector3(cube_x, cube_y, cube_z);
+        //获取新的cube两方块位置
+        var center_x = Math.floor(cube_x);
+        var center_z = Math.floor(cube_z);
+        if (center_x === cube_x && center_z === cube_z) {
+            this.cube1_pos_pre = new Laya.Vector3(center_x, 0, center_z);
+            this.cube2_pos_pre = new Laya.Vector3(center_x, 1, center_z);
+        }
+        else if (center_x === cube_x) {
+            this.cube1_pos_pre = new Laya.Vector3(center_x, 0, center_z);
+            this.cube2_pos_pre = new Laya.Vector3(center_x, 0, cube_z * 2 - center_z);
+        }
+        else if (center_z === cube_z) {
+            this.cube1_pos_pre = new Laya.Vector3(center_x, 0, center_z);
+            this.cube2_pos_pre = new Laya.Vector3(cube_x * 2 - center_x, 0, center_z);
+        }
+        else {
+            //异常处理
+            console.log("updateCubePos需要异常处理！");
+        }
+    };
+    /**cube动作接口函数调用的动画函数调用的分解动作函数调用的原子动作函数 代码块结束 */
+    /**cube动作接口函数所需的逻辑 代码块开始 */
     GameView.prototype.fall_full = function (dir) {
+        this.canOperate = false;
         switch (dir) {
             case Direction.UP:
                 this.fallUp();
@@ -96231,6 +96776,7 @@ var GameView = /** @class */ (function () {
         }
     };
     GameView.prototype.fall_half = function (pos_empty, pos_safe) {
+        this.canOperate = false;
         if (pos_empty.x > pos_safe.x) {
             var pivot = new Laya.Vector3(pos_empty.x - 0.5, -1, pos_empty.z);
             this.fallRight_half(pivot);
@@ -96252,27 +96798,229 @@ var GameView = /** @class */ (function () {
             console.log("fall_half需要异常处理！");
         }
     };
-    GameView.prototype.fall_straight = function () {
-        this.fallStraightAni(9);
+    GameView.prototype.fall_straight_win = function () {
+        this.canOperate = false;
+        this.fallStraightWinAni(0.2, 27);
+    };
+    GameView.prototype.fall_straight_lose = function (block) {
+        this.canOperate = false;
+        this.fallStraightLoseAni(block, 0.2, 27);
+    };
+    GameView.prototype.fall_in = function (height) {
+        this.fallInAni(1, height);
+    };
+    GameView.prototype.checkEmpty = function (pos) {
+        if (pos.x >= this.MAX_WIDTH || pos.x < 0 || pos.z >= this.MAX_LENGTH || pos.z < 0) {
+            return true;
+        }
+        else if (this.map_info[pos.z][pos.x] === Block.EMPTY) {
+            return true;
+        }
+        else if (this.map_info[pos.z][pos.x] === Block.IRON && this.getIronInfo(pos.x, pos.z)["state"] === false) {
+            return true;
+        }
+        return false;
+    };
+    GameView.prototype.getSwitchInfo = function (x, z) {
+        for (var i = 0, len = this.switch_info.length; i < len; i++) {
+            if (this.switch_info[i]["switch_pos"][0] === z
+                && this.switch_info[i]["switch_pos"][1] === x) {
+                return this.switch_info[i];
+            }
+        }
+        return null;
+    };
+    GameView.prototype.getIronInfo = function (x, z) {
+        for (var i = 0, len = this.switch_info.length; i < len; i++) {
+            for (var j = 0, wid = this.switch_info[i]["control_list"].length; j < wid; j++) {
+                if (this.iron_list[this.switch_info[i]["control_list"][j]["index"]]["iron_pos"][0] === z
+                    && this.iron_list[this.switch_info[i]["control_list"][j]["index"]]["iron_pos"][1] === x) {
+                    return this.iron_list[this.switch_info[i]["control_list"][j]["index"]];
+                }
+            }
+        }
+        return null;
+    };
+    GameView.prototype.controlTriggers = function (trigger) {
+        if (trigger["used"] && trigger["once"]) {
+            return;
+        }
+        trigger["used"] = true;
+        for (var i = 0, len = trigger["control_list"].length; i < len; i++) {
+            if (trigger["control_list"][i]["type"] === "both") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === true) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = false;
+                    this.moveTriggersOff(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === false) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = true;
+                    this.moveTriggersOn(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else {
+                    console.log("need write code");
+                }
+            }
+            if (trigger["control_list"][i]["type"] === "off") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === true) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = false;
+                    this.moveTriggersOff(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else {
+                    console.log("need write code");
+                }
+            }
+            else if (trigger["control_list"][i]["type"] === "on") {
+                if (this.iron_list[trigger["control_list"][i]["index"]]["state"] === false) {
+                    this.iron_list[trigger["control_list"][i]["index"]]["state"] = true;
+                    this.moveTriggersOn(this.iron_list[trigger["control_list"][i]["index"]]);
+                }
+                else {
+                    console.log("need write code");
+                }
+            }
+            else {
+                console.log("not find control_list.type or type === both");
+            }
+        }
+    };
+    GameView.prototype.setTriggers = function () {
+        for (var i = 0, len = this.iron_list.length; i < len; i++) {
+            if (this.iron_list[i]["state"] === false) {
+                this.moveTriggersOff(this.iron_list[i]);
+            }
+        }
+    };
+    GameView.prototype.moveTriggersOff = function (iron) {
+        var iron_block = this.map[iron["iron_pos"][1]][iron["iron_pos"][0]];
+        switch (iron["off"]) {
+            case "left":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x - 0.5, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, -20), 9);
+                break;
+            case "right":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x + 0.5, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, 20), 9);
+                break;
+            case "up":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z - 0.5), new Laya.Vector3(20, 0, 0), 9);
+                break;
+            case "down":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y - block_depth / 2, iron_block.transform.position.z + 0.5), new Laya.Vector3(-20, 0, 0), 9);
+                break;
+            default:
+                console.log("moveTriggersOff exception");
+                break;
+        }
+    };
+    GameView.prototype.moveTriggersOn = function (iron) {
+        var iron_block = this.map[iron["iron_pos"][1]][iron["iron_pos"][0]];
+        switch (iron["off"]) {
+            case "left":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x + 0.5, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, 20), 9);
+                break;
+            case "right":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x - 0.5, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z), new Laya.Vector3(0, 0, -20), 9);
+                break;
+            case "up":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z + 0.5), new Laya.Vector3(-20, 0, 0), 9);
+                break;
+            case "down":
+                this.ironRotateAni(iron_block, new Laya.Vector3(iron_block.transform.position.x, iron_block.transform.position.y + block_depth / 2, iron_block.transform.position.z - 0.5), new Laya.Vector3(20, 0, 0), 9);
+                break;
+            default:
+                console.log("moveTriggersOn exception");
+                break;
+        }
+    };
+    GameView.prototype.ironRotateAni = function (iron_block, pivotVector, rotateVector, times) {
+        var _this = this;
+        //异步的
+        var count = 0;
+        var newTimer = null;
+        clearInterval(newTimer);
+        newTimer = setInterval(function () {
+            _this.doIronRotate(iron_block, pivotVector, rotateVector);
+            count++;
+            if (count >= times) {
+                //旋转180度调用回调函数
+                clearInterval(newTimer);
+            }
+        }, millisec);
+    };
+    GameView.prototype.doIronRotate = function (iron_block, pivotVector, rotateVector) {
+        this.myRotate(iron_block, pivotVector, rotateVector);
+    };
+    GameView.prototype.split = function () {
+    };
+    GameView.prototype.playSound = function (name) {
+        Laya.SoundManager.playSound("sound/" + name + ".mp3");
+    };
+    GameView.prototype.judgeType = function (position) {
+        return this.map_info[position.z][position.x];
+    };
+    GameView.prototype.makeSound = function () {
+        //先修正一下预测位置
+        this.updateCubePosPre();
+        var name;
+        //普通掉落
+        var fall_1 = this.checkEmpty(this.cube1_pos_pre);
+        var fall_2 = this.checkEmpty(this.cube2_pos_pre);
+        if (fall_1 === true && fall_2 === true) {
+            name = "fall";
+        }
+        else if (fall_1 === true) {
+            name = "fall";
+        }
+        else if (fall_2 === true) {
+            name = "fall";
+        }
+        else {
+            var type_1 = this.judgeType(this.cube1_pos_pre);
+            var type_2 = this.judgeType(this.cube2_pos_pre);
+            //发声有点复杂 暂时暴力一点 根据权重瞎选一个播放
+            //轻机关 优先
+            //然后 铁板
+            //木板 其次
+            //最后 石板
+            if (type_1 === Block.LIGHT || type_2 === Block.LIGHT) {
+                name = "trigger";
+            }
+            else if (type_1 === Block.HELP || type_2 === Block.HELP) {
+                name = "trigger";
+            }
+            else if (type_1 === Block.IRON) {
+                if (this.getIronInfo(this.cube1_pos_pre.x, this.cube1_pos_pre.z)["state"]) {
+                    name = "metal";
+                }
+            }
+            else if (type_2 === Block.IRON) {
+                if (this.getIronInfo(this.cube2_pos_pre.x, this.cube2_pos_pre.z)["state"]) {
+                    name = "metal";
+                }
+            }
+            else if (type_1 === Block.MUBAN || type_2 === Block.MUBAN) {
+                name = "wood";
+            }
+            else if (this.cube1_pos_pre.x === this.cube2_pos_pre.x && this.cube1_pos_pre.z === this.cube2_pos_pre.z
+                && type_1 === Block.HEAVY) {
+                name = "trigger";
+            }
+            else if (this.cube1_pos_pre.x === this.cube2_pos_pre.x && this.cube1_pos_pre.z === this.cube2_pos_pre.z
+                && type_1 === Block.SPLIT) {
+                name = "transform";
+            }
+            else if (this.cube1_pos_pre.x === this.cube2_pos_pre.x && this.cube1_pos_pre.z === this.cube2_pos_pre.z
+                && type_1 === Block.END) {
+                name = "end";
+            }
+            else {
+                name = "stone";
+            }
+        }
+        this.playSound(name);
     };
     GameView.prototype.checkFall = function () {
         //普通掉落
-        var fall_1;
-        var fall_2;
-        if (this.cube1_pos.x >= this.MAX_WIDTH || this.cube1_pos.x < 0 ||
-            this.cube1_pos.z >= this.MAX_LENGTH || this.cube1_pos.z < 0) {
-            fall_1 = true;
-        }
-        else {
-            fall_1 = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.EMPTY);
-        }
-        if (this.cube2_pos.x >= this.MAX_WIDTH || this.cube2_pos.x < 0 ||
-            this.cube2_pos.z >= this.MAX_LENGTH || this.cube2_pos.z < 0) {
-            fall_2 = true;
-        }
-        else {
-            fall_2 = (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.EMPTY);
-        }
+        var fall_1 = this.checkEmpty(this.cube1_pos);
+        var fall_2 = this.checkEmpty(this.cube2_pos);
         if (fall_1 === true && fall_2 === true) {
             this.fall_full(this.lastMove);
             return State.FAILURE;
@@ -96286,16 +97034,65 @@ var GameView = /** @class */ (function () {
             return State.FAILURE;
         }
         //红木掉落
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+            && this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.MUBAN) {
+            this.fall_straight_lose(this.map[this.cube1_pos.x][this.cube1_pos.z]);
+            return State.FAILURE;
+        }
         //终点掉落
         var win_1 = (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.END);
         var win_2 = (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.END);
         if (win_1 === true && win_2 === true) {
-            this.fall_straight();
+            this.fall_straight_win();
             return State.SUCCESS;
+        }
+        //踩到轻机关
+        if (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.LIGHT) {
+            this.controlTriggers(this.getSwitchInfo(this.cube1_pos.x, this.cube1_pos.z));
+        }
+        if (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.LIGHT) {
+            this.controlTriggers(this.getSwitchInfo(this.cube2_pos.x, this.cube2_pos.z));
+        }
+        //踩到重机关
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+            && this.map_info[this.cube1_pos.z][this.cube2_pos.x] === Block.HEAVY) {
+            this.controlTriggers(this.getSwitchInfo(this.cube1_pos.x, this.cube1_pos.z));
+        }
+        //踩到分身机关
+        if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+            && this.map_info[this.cube1_pos.z][this.cube2_pos.x] === Block.SPLIT) {
+            this.split();
         }
         return State.GAMING;
     };
+    GameView.prototype.checkState = function () {
+        //检查游戏状态 判断是否应该重新开始 或者进行下一关
+        var currentState = this.checkFall();
+        if (currentState === State.FAILURE) {
+            //啥也不用干 因为会在掉落动画结束后处理
+            return;
+        }
+        else if (currentState === State.SUCCESS) {
+            //啥也不用干 因为会在掉落动画结束后处理
+            return;
+        }
+        else if (currentState === State.GAMING) {
+            //维持消息机制
+            this.checkMessageQueue();
+        }
+    };
+    GameView.prototype.restart = function () {
+        this.restartAni(30);
+    };
+    GameView.prototype.goToNext = function () {
+        this.loadNext();
+    };
+    /**cube动作接口函数所需的逻辑 代码块结束 */
+    /**消息机制 代码块开始 */
     GameView.prototype.addMessage = function (operation) {
+        if (!this.canOperate) {
+            return;
+        }
         this.messageQueue.push(operation);
         if (!this.messageBusy) {
             this.messageBusy = true;
@@ -96303,6 +97100,9 @@ var GameView = /** @class */ (function () {
         }
     };
     GameView.prototype.checkMessageQueue = function () {
+        if (!this.canOperate) {
+            return;
+        }
         if (this.messageQueue.length === 0) {
             this.messageBusy = false;
             return;
@@ -96329,29 +97129,9 @@ var GameView = /** @class */ (function () {
             }
         }
     };
-    //test
-    GameView.prototype.myAnimation = function (fn_action) {
-        var _this = this;
-        fn_action();
-        //异步的
-        var count = 0;
-        var newTimer = null;
-        clearInterval(newTimer);
-        newTimer = setInterval(function () {
-            count++;
-            if (1) {
-                //旋转90度调用回调函数
-                clearInterval(newTimer);
-                _this.updateCubePos();
-                _this.checkMessageQueue();
-                _this.fallLeft();
-            }
-        }, 1);
-    };
     return GameView;
 }());
-//# sourceMappingURL=view.js.map
-;
+//# sourceMappingURL=gameView.js.map
 var game = /** @class */ (function () {
     function game(fileName) {
         var _this = this;
@@ -96360,32 +97140,32 @@ var game = /** @class */ (function () {
             while (!(_this.triggers[i].pos[0] === posx && _this.triggers[i].pos[1] === posy))
                 i++;
             for (var block in _this.triggers[i].blocks) {
-                if (_this.map[block[1]][block[0]] === 0)
-                    _this.map[block[1]][block[0]] = 6 /* metal */;
-                else if (_this.map[block[1]][block[0]] === 6 /* metal */)
-                    _this.map[block[1]][block[0]] = 0;
+                if (_this.map[block[1]][block[0]] === Block.IRON)
+                    _this.map[block[1]][block[0]] = Block.EMPTY;
+                else if (_this.map[block[1]][block[0]] === Block.EMPTY)
+                    _this.map[block[1]][block[0]] = Block.IRON;
             }
         };
         this.update = function () {
             //lose
             if (_this.pos[0][0] < 0 || _this.pos[1][0] > _this.size[0] || _this.pos[0][1] < 0 || _this.pos[1][1] > _this.size[1])
-                return 0;
-            if (_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === 0 /* empty */ || _this.map[_this.pos[0][1]][_this.pos[0][0]] === 2 /* red */))
-                return 0;
-            if (!_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === 0 /* empty */ || _this.map[_this.pos[1][1] - 1][_this.pos[1][0] - 1] === 0 /* empty */))
-                return 0;
+                return State.FAILURE;
+            if (_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === Block.EMPTY || _this.map[_this.pos[0][1]][_this.pos[0][0]] === Block.MUBAN))
+                return State.FAILURE;
+            if (!_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === Block.EMPTY || _this.map[_this.pos[1][1] - 1][_this.pos[1][0] - 1] === Block.EMPTY))
+                return State.FAILURE;
             //win
-            if (_this.blockVertical && _this.map[_this.pos[0][1]][_this.pos[0][0]] === 5 /* end */)
-                return 2;
+            if (_this.blockVertical && _this.map[_this.pos[0][1]][_this.pos[0][0]] === Block.END)
+                return State.SUCCESS;
             //trigger
-            if (_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === 3 /* oButton */ || _this.map[_this.pos[0][1]][_this.pos[0][0]] === 4 /* xButton */))
+            if (_this.blockVertical && (_this.map[_this.pos[0][1]][_this.pos[0][0]] === Block.LIGHT || _this.map[_this.pos[0][1]][_this.pos[0][0]] === Block.HEAVY))
                 _this.trigger.apply(_this.pos[0][0], _this.pos[0][1]);
-            if (!_this.blockVertical && _this.map[_this.pos[0][1]][_this.pos[0][0]] === 3 /* oButton */)
+            if (!_this.blockVertical && _this.map[_this.pos[0][1]][_this.pos[0][0]] === Block.LIGHT)
                 _this.trigger.apply(_this.pos[0][0], _this.pos[0][1]);
-            if (!_this.blockVertical && _this.map[_this.pos[1][1] - 1][_this.pos[1][0] - 1] === 3 /* oButton */)
+            if (!_this.blockVertical && _this.map[_this.pos[1][1] - 1][_this.pos[1][0] - 1] === Block.LIGHT)
                 _this.trigger.apply(_this.pos[1][0] - 1, _this.pos[1][1] - 1);
             //continue
-            return 1;
+            return State.GAMING;
         };
         this.moveleft = function () {
             if (_this.blockVertical) {
@@ -96464,14 +97244,17 @@ var game = /** @class */ (function () {
             console.log(_this.pos.toString());
         };
         this.filename = fileName;
-        this.file = Laya.loader.getRes("res/" + this.filename + ".json");
+        this.file = Laya.loader.getRes("res/map_" + this.filename + ".json");
         this.map = this.file["map"];
-        this.size = [this.map[0].length, this.map.length];
-        this.pos = this.file["startpos"];
+        this.size = [this.file["map_length"], this.file["map_width"]];
+        this.pos = [this.file["startpos"], [this.file["startpos"][0] + 1, this.file["startpos"][1] + 1]];
         this.triggers = this.file["triggers"];
         this.blockVertical = true;
+        this.stepcount = 0;
+        this.timecount = 0;
     }
     game.prototype.move = function (direction) {
+        this.stepcount++;
         switch (direction) {
             case Operation.UP:
                 this.moveup.apply(null);
@@ -96501,100 +97284,310 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var myUI;
+(function (myUI) {
+    var SelectList = /** @class */ (function () {
+        function SelectList(parent) {
+            this.parent = parent;
+            this.selectListUI = new ui.select_listUI();
+            this.list = new Laya.List();
+            this.selectListUI.addChild(this.list);
+            this.list.itemRender = Item;
+            this.list.repeatX = 5;
+            this.list.repeatY = 2;
+            this.list.vScrollBarSkin = "";
+            this.list.selectEnable = true;
+            this.list.selectHandler = new Laya.Handler(this, this.onSelect);
+            this.list.renderHandler = new Laya.Handler(this, this.upDateItem);
+            this.levels_file = 'res/levels.json';
+            var res = [{ url: this.levels_file, type: Laya.Loader.JSON }];
+            Laya.loader.load(res, Laya.Handler.create(this, this.update), null);
+        }
+        SelectList.prototype.update = function () {
+            this.levels = Laya.loader.getRes(this.levels_file);
+            var defaultExist = false;
+            var data = [];
+            var i;
+            for (i = 1; i < this.levels['total_level']; i++) {
+                if (!defaultExist && this.levels['levels'][i] === -1) {
+                    defaultExist = true;
+                    this.parent.setCurrentLevel(i - 1);
+                }
+                data.push([i, this.levels['levels'][i]]);
+            }
+            this.list.array = data;
+            if (!defaultExist) {
+                this.parent.setCurrentLevel(i - 1);
+            }
+        };
+        SelectList.prototype.upDateItem = function (cell, index) {
+            if (index === this.parent.getCurrentLevel() - 1) {
+                cell.setImg(cell.dataSource, true);
+            }
+            else {
+                cell.setImg(cell.dataSource, false);
+            }
+        };
+        SelectList.prototype.onSelect = function (index) {
+            index++;
+            if (this.levels['levels'][index] === -1) {
+                return;
+            }
+            this.parent.setCurrentLevel(index);
+        };
+        return SelectList;
+    }());
+    myUI.SelectList = SelectList;
+    var Item = /** @class */ (function (_super) {
+        __extends(Item, _super);
+        function Item() {
+            var _this = _super.call(this) || this;
+            _this.size(Item.WID, Item.HEI);
+            _this.img_n1 = new Laya.Image();
+            _this.img_n1.x = Item.WID / 2 - Item.NUMBER_WID;
+            _this.img_n1.size(Item.NUMBER_WID, Item.NUMBER_HEI);
+            _this.addChild(_this.img_n1);
+            _this.img_n2 = new Laya.Image();
+            _this.img_n2.x = Item.WID / 2;
+            _this.img_n2.size(Item.NUMBER_WID, Item.NUMBER_HEI);
+            _this.addChild(_this.img_n2);
+            _this.img_s = new Array();
+            var x_0 = (Item.WID - Item.STAR_NUM * Item.STAR_WID) / 2;
+            for (var i = 0; i < Item.STAR_NUM; i++) {
+                var newImage = new Laya.Image();
+                newImage.x = x_0 + i * Item.STAR_WID;
+                newImage.y = Item.NUMBER_HEI;
+                newImage.size(Item.STAR_WID, Item.STAR_HEI);
+                _this.img_s.push(newImage);
+                _this.addChild(_this.img_s[i]);
+            }
+            _this.img_c = new Laya.Image();
+            _this.img_c.x = (Item.WID - Item.CURSOR_WID) / 2;
+            _this.img_c.size(Item.CURSOR_WID, Item.CURSOR_HEI);
+            _this.addChild(_this.img_c);
+            return _this;
+        }
+        Item.prototype.setImg = function (index, iscurrentLevel) {
+            this.img_n1.skin = this.indexToString_num(Math.floor(index[0] / 10));
+            this.img_n2.skin = this.indexToString_num(index[0] % 10);
+            if (index[1] === -1) {
+                this.img_s[Math.floor(Item.STAR_NUM / 2)].skin = 'itemres/locked.png';
+            }
+            else {
+                var i = 0;
+                for (i = 0; i < index[1]; i++) {
+                    this.img_s[i].skin = this.indexToString_star(1);
+                }
+                for (i; i < Item.STAR_NUM; i++) {
+                    this.img_s[i].skin = this.indexToString_star(0);
+                }
+            }
+            if (iscurrentLevel) {
+                this.img_c.skin = 'itemres/cursor.png';
+            }
+            else {
+                this.img_c.skin = null;
+            }
+        };
+        Item.prototype.indexToString_num = function (index) {
+            return 'itemres/number_' + index.toString() + '.png';
+        };
+        Item.prototype.indexToString_star = function (index) {
+            return 'itemres/star_' + index.toString() + '.png';
+        };
+        Item.WID = 180;
+        Item.HEI = 180;
+        Item.NUMBER_WID = 60;
+        Item.NUMBER_HEI = 100;
+        Item.STAR_WID = 30;
+        Item.STAR_HEI = 30;
+        Item.STAR_NUM = 3;
+        Item.CURSOR_WID = 140;
+        Item.CURSOR_HEI = 140;
+        return Item;
+    }(Laya.Box));
+})(myUI || (myUI = {}));
+//# sourceMappingURL=selectList.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var View = laya.ui.View;
 var Dialog = laya.ui.Dialog;
 var ui;
 (function (ui) {
-    var finishUI = /** @class */ (function (_super) {
-        __extends(finishUI, _super);
-        function finishUI() {
+    var finish_dialogUI = /** @class */ (function (_super) {
+        __extends(finish_dialogUI, _super);
+        function finish_dialogUI() {
             return _super.call(this) || this;
         }
-        finishUI.prototype.createChildren = function () {
+        finish_dialogUI.prototype.createChildren = function () {
             _super.prototype.createChildren.call(this);
-            this.createView(ui.finishUI.uiView);
+            this.createView(ui.finish_dialogUI.uiView);
         };
-        finishUI.uiView = { "type": "Dialog", "props": { "width": 600, "height": 600 }, "child": [{ "type": "TextArea", "props": { "width": 379, "text": "恭喜你过关了！", "height": 73, "fontSize": 50, "font": "Microsoft YaHei", "color": "#ffffff", "centerY": -200, "centerX": 0, "align": "center" } }, { "type": "Button", "props": { "width": 150, "var": "nextlevel", "stateNum": 3, "skin": "button.png", "mouseEnabled": true, "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "下一关", "height": 50, "centerY": 50, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "restart", "stateNum": 3, "skin": "button.png", "mouseEnabled": true, "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "重玩本关", "height": 50, "centerY": 120, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "back", "stateNum": 3, "skin": "button.png", "mouseEnabled": true, "labelSize": 25, "labelFont": "SimHei", "labelAlign": "center", "label": "返回主菜单", "height": 50, "centerY": 190, "centerX": 0 } }] };
-        return finishUI;
+        finish_dialogUI.uiView = { "type": "Dialog", "props": { "width": 600, "height": 600 }, "child": [{ "type": "TextArea", "props": { "width": 379, "text": "恭喜你过关了！", "height": 73, "fontSize": 50, "font": "Microsoft YaHei", "color": "#ffffff", "centerY": -200, "centerX": 0, "align": "center" } }, { "type": "Button", "props": { "width": 150, "var": "nextlevel", "stateNum": 3, "skin": "button.png", "mouseEnabled": true, "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "下一关", "height": 50, "centerY": 50, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "restart", "stateNum": 3, "skin": "button.png", "mouseEnabled": true, "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "重玩本关", "height": 50, "centerY": 120, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "back", "stateNum": 3, "skin": "button.png", "mouseEnabled": true, "labelSize": 25, "labelFont": "SimHei", "labelAlign": "center", "label": "返回主菜单", "height": 50, "centerY": 190, "centerX": 0 } }] };
+        return finish_dialogUI;
     }(Dialog));
-    ui.finishUI = finishUI;
+    ui.finish_dialogUI = finish_dialogUI;
 })(ui || (ui = {}));
 (function (ui) {
-    var gameUI = /** @class */ (function (_super) {
-        __extends(gameUI, _super);
-        function gameUI() {
+    var game_barUI = /** @class */ (function (_super) {
+        __extends(game_barUI, _super);
+        function game_barUI() {
             return _super.call(this) || this;
         }
-        gameUI.prototype.createChildren = function () {
+        game_barUI.prototype.createChildren = function () {
             _super.prototype.createChildren.call(this);
-            this.createView(ui.gameUI.uiView);
+            this.createView(ui.game_barUI.uiView);
         };
-        gameUI.uiView = { "type": "View", "props": { "width": 1334, "name": "game", "height": 750 }, "child": [{ "type": "Button", "props": { "width": 150, "visible": true, "var": "leftbutton", "stateNum": 2, "skin": "arrow.png", "right": 290, "mouseEnabled": true, "height": 85, "bottom": 165 } }, { "type": "Button", "props": { "width": 150, "var": "downbutton", "stateNum": 2, "skin": "arrow.png", "rotation": 270, "right": 150, "mouseEnabled": true, "height": 85, "bottom": -50 } }, { "type": "Button", "props": { "width": 150, "visible": true, "var": "rightbutton", "stateNum": 2, "skin": "arrow.png", "rotation": 180, "right": -80, "mouseEnabled": true, "height": 85, "bottom": 80 } }, { "type": "Button", "props": { "width": 150, "visible": true, "var": "upbutton", "stateNum": 2, "skin": "arrow.png", "rotation": 90, "right": 65, "mouseEnabled": true, "height": 85, "bottom": 300 } }, { "type": "Button", "props": { "width": 64, "var": "pausebutton", "top": 10, "stateNum": 1, "skin": "pause.png", "right": 10, "height": 64 } }] };
-        return gameUI;
+        game_barUI.uiView = { "type": "Dialog", "props": { "width": 1334, "top": 0, "left": 0, "height": 300 }, "child": [{ "type": "Button", "props": { "width": 50, "var": "pauseButton", "top": 50, "skin": "pause.png", "left": 50, "height": 50 } }, { "type": "Label", "props": { "width": 300, "var": "movesLabel", "top": 10, "text": "步数", "left": 200, "height": 30, "fontSize": 30, "font": "Arial", "color": "#ffffff" } }, { "type": "Label", "props": { "width": 300, "var": "timeLabel", "top": 10, "text": "时间", "left": 600, "height": 30, "fontSize": 30, "font": "Arial", "color": "#ffffff" } }] };
+        return game_barUI;
+    }(Dialog));
+    ui.game_barUI = game_barUI;
+})(ui || (ui = {}));
+(function (ui) {
+    var logoUI = /** @class */ (function (_super) {
+        __extends(logoUI, _super);
+        function logoUI() {
+            return _super.call(this) || this;
+        }
+        logoUI.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
+            this.createView(ui.logoUI.uiView);
+        };
+        logoUI.uiView = { "type": "Dialog", "props": { "width": 894, "height": 360, "centerX": 0, "bottom": 0 }, "child": [{ "type": "Image", "props": { "width": 432, "skin": "logo.png", "height": 240, "centerY": 0, "centerX": 0 } }] };
+        return logoUI;
+    }(Dialog));
+    ui.logoUI = logoUI;
+})(ui || (ui = {}));
+(function (ui) {
+    var pause_dialogUI = /** @class */ (function (_super) {
+        __extends(pause_dialogUI, _super);
+        function pause_dialogUI() {
+            return _super.call(this) || this;
+        }
+        pause_dialogUI.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
+            this.createView(ui.pause_dialogUI.uiView);
+        };
+        pause_dialogUI.uiView = { "type": "Dialog", "props": { "width": 400, "popupCenter": true, "height": 400, "centerY": 0, "centerX": 0 }, "child": [{ "type": "TextArea", "props": { "width": 210, "text": "游戏暂停", "height": 57, "fontSize": 50, "font": "SimHei", "editable": false, "color": "#ffffff", "centerY": -100, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "backToGame", "stateNum": 3, "skin": "button.png", "name": "close", "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "回到游戏", "height": 50, "centerY": 16, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "backToMain", "stateNum": 3, "skin": "button.png", "labelSize": 25, "labelFont": "SimHei", "labelAlign": "center", "label": "返回主菜单", "height": 50, "centerY": 140, "centerX": 0 } }] };
+        return pause_dialogUI;
+    }(Dialog));
+    ui.pause_dialogUI = pause_dialogUI;
+})(ui || (ui = {}));
+(function (ui) {
+    var rank_listUI = /** @class */ (function (_super) {
+        __extends(rank_listUI, _super);
+        function rank_listUI() {
+            return _super.call(this) || this;
+        }
+        rank_listUI.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
+            this.createView(ui.rank_listUI.uiView);
+        };
+        rank_listUI.uiView = { "type": "Dialog", "props": { "width": 600, "height": 800, "centerY": 0, "centerX": 0 }, "child": [{ "type": "Button", "props": { "width": 200, "stateNum": 3, "skin": "button.png", "name": "close", "labelSize": 30, "labelFont": "SimHei", "label": "关闭", "height": 50, "centerX": 0, "bottom": 50 } }] };
+        return rank_listUI;
+    }(Dialog));
+    ui.rank_listUI = rank_listUI;
+})(ui || (ui = {}));
+(function (ui) {
+    var select_listUI = /** @class */ (function (_super) {
+        __extends(select_listUI, _super);
+        function select_listUI() {
+            return _super.call(this) || this;
+        }
+        select_listUI.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
+            this.createView(ui.select_listUI.uiView);
+        };
+        select_listUI.uiView = { "type": "View", "props": { "width": 900, "height": 360, "centerX": 0, "bottom": 0 } };
+        return select_listUI;
     }(View));
-    ui.gameUI = gameUI;
+    ui.select_listUI = select_listUI;
 })(ui || (ui = {}));
 (function (ui) {
-    var helpUI = /** @class */ (function (_super) {
-        __extends(helpUI, _super);
-        function helpUI() {
+    var start_viewUI = /** @class */ (function (_super) {
+        __extends(start_viewUI, _super);
+        function start_viewUI() {
             return _super.call(this) || this;
         }
-        helpUI.prototype.createChildren = function () {
+        start_viewUI.prototype.createChildren = function () {
             _super.prototype.createChildren.call(this);
-            this.createView(ui.helpUI.uiView);
+            this.createView(ui.start_viewUI.uiView);
         };
-        helpUI.uiView = { "type": "Dialog", "props": { "width": 800, "height": 600 } };
-        return helpUI;
-    }(Dialog));
-    ui.helpUI = helpUI;
-})(ui || (ui = {}));
-(function (ui) {
-    var pauseUI = /** @class */ (function (_super) {
-        __extends(pauseUI, _super);
-        function pauseUI() {
-            return _super.call(this) || this;
-        }
-        pauseUI.prototype.createChildren = function () {
-            _super.prototype.createChildren.call(this);
-            this.createView(ui.pauseUI.uiView);
-        };
-        pauseUI.uiView = { "type": "Dialog", "props": { "width": 400, "popupCenter": true, "height": 400, "centerY": 0, "centerX": 0 }, "child": [{ "type": "TextArea", "props": { "width": 210, "text": "游戏暂停", "height": 57, "fontSize": 50, "font": "SimHei", "color": "#ffffff", "centerY": -100, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "backToGame", "stateNum": 3, "skin": "button.png", "name": "close", "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "回到游戏", "height": 50, "centerY": 0, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "backToMain", "stateNum": 3, "skin": "button.png", "labelSize": 25, "labelFont": "SimHei", "labelAlign": "center", "label": "返回主菜单", "height": 50, "centerY": 140, "centerX": 0 } }, { "type": "Button", "props": { "width": 150, "var": "restart", "stateNum": 3, "skin": "button.png", "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "重玩本关", "height": 50, "centerY": 70, "centerX": 0 } }] };
-        return pauseUI;
-    }(Dialog));
-    ui.pauseUI = pauseUI;
-})(ui || (ui = {}));
-(function (ui) {
-    var selectUI = /** @class */ (function (_super) {
-        __extends(selectUI, _super);
-        function selectUI() {
-            return _super.call(this) || this;
-        }
-        selectUI.prototype.createChildren = function () {
-            _super.prototype.createChildren.call(this);
-            this.createView(ui.selectUI.uiView);
-        };
-        selectUI.uiView = { "type": "Dialog", "props": { "width": 800, "height": 600 } };
-        return selectUI;
-    }(Dialog));
-    ui.selectUI = selectUI;
-})(ui || (ui = {}));
-(function (ui) {
-    var startUI = /** @class */ (function (_super) {
-        __extends(startUI, _super);
-        function startUI() {
-            return _super.call(this) || this;
-        }
-        startUI.prototype.createChildren = function () {
-            _super.prototype.createChildren.call(this);
-            this.createView(ui.startUI.uiView);
-        };
-        startUI.uiView = { "type": "View", "props": { "width": 1334, "name": "start", "height": 750 }, "child": [{ "type": "Button", "props": { "width": 200, "var": "startButton", "stateNum": 3, "skin": "button.png", "rotation": 0, "mouseEnabled": true, "labelStrokeColor": "#000000", "labelStroke": 0, "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "开始游戏", "height": 50, "centerY": 100, "centerX": -150 } }, { "type": "Button", "props": { "width": 200, "var": "helpButton", "stateNum": 3, "skin": "button.png", "rotation": 0, "mouseEnabled": true, "labelStrokeColor": "#ffffff", "labelStroke": 0, "labelSize": 30, "labelFont": "SimHei", "labelAlign": "center", "label": "游戏帮助", "height": 50, "centerY": 100, "centerX": 150 } }, { "type": "Image", "props": { "skin": "logo.png", "centerY": -100, "centerX": 0 } }] };
-        return startUI;
+        start_viewUI.uiView = { "type": "View", "props": { "width": 1334, "name": "start", "height": 750 }, "child": [{ "type": "Button", "props": { "width": 120, "visible": true, "var": "leftButton", "stateNum": 2, "skin": "arrow_large_4.png", "rotation": 0, "mouseEnabled": true, "left": 50, "height": 120, "bottom": 20 } }, { "type": "Button", "props": { "width": 120, "var": "downButton", "stateNum": 2, "skin": "arrow_large_3.png", "rotation": 0, "right": 50, "mouseEnabled": true, "height": 120, "bottom": 20 } }, { "type": "Button", "props": { "width": 120, "visible": true, "var": "rightButton", "stateNum": 2, "skin": "arrow_large_1.png", "rotation": 0, "right": 50, "mouseEnabled": true, "height": 120, "bottom": 240 } }, { "type": "Button", "props": { "width": 120, "visible": true, "var": "upButton", "stateNum": 2, "skin": "arrow_large_2.png", "rotation": 0, "mouseEnabled": true, "left": 50, "height": 120, "bottom": 240 } }, { "type": "Button", "props": { "width": 120, "var": "ranklistButton", "top": 10, "stateNum": 3, "skin": "button.png", "left": 10, "labelSize": 30, "labelFont": "SimHei", "label": "排行榜", "height": 50 } }] };
+        return start_viewUI;
     }(View));
-    ui.startUI = startUI;
+    ui.start_viewUI = start_viewUI;
 })(ui || (ui = {}));
 //# sourceMappingURL=layaUI.max.all.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+/**Created by the LayaAirIDE*/
+var view;
+(function (view) {
+    var rankList = /** @class */ (function (_super) {
+        __extends(rankList, _super);
+        function rankList() {
+            var _this = _super.call(this) || this;
+            _this.sharedCanvas = null;
+            return _this;
+        }
+        rankList.prototype.draw = function () {
+            wx.getOpenDataContext().postMessage({ type: "show" });
+            console.log("draw");
+            this.graphics.clear();
+            if (null === this.sharedCanvas) {
+                this.sharedCanvas = wx.getOpenDataContext().canvas;
+                this.subTex = new Laya.Texture(this.sharedCanvas);
+            }
+            if (null != this.sharedCanvas) {
+                this.subTex.bitmap.alwaysChange = true;
+                this.graphics.drawTexture(this.subTex, 50, 50, 500, 600);
+            }
+        };
+        return rankList;
+    }(ui.rank_listUI));
+    view.rankList = rankList;
+})(view || (view = {}));
+//# sourceMappingURL=rank_list.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+/**Created by the LayaAirIDE*/
+var view;
+(function (view) {
+    var select_list = /** @class */ (function (_super) {
+        __extends(select_list, _super);
+        function select_list() {
+            return _super.call(this) || this;
+        }
+        return select_list;
+    }(ui.select_listUI));
+    view.select_list = select_list;
+})(view || (view = {}));
+//# sourceMappingURL=select_list.js.map
 // 程序入口
 var LayaAir3D = /** @class */ (function () {
     function LayaAir3D() {
@@ -96609,46 +97602,8 @@ var LayaAir3D = /** @class */ (function () {
         Laya.stage.screenMode = Laya.Stage.SCREEN_HORIZONTAL;
         //开启统计信息
         Laya.Stat.show();
-        var res = [{ url: "arrow.png", type: Laya.Loader.IMAGE }, { url: "pause.png", type: Laya.Loader.IMAGE }, { url: "button.png", type: Laya.Loader.IMAGE }];
-        Laya.loader.load(res, Laya.Handler.create(this, this.loadui), null);
+        var test = new MenuView();
     }
-    LayaAir3D.prototype.loadui = function () {
-        this.startui = new ui.startUI();
-        this.startui.startButton.on(Laya.Event.MOUSE_DOWN, this, function () { Laya.loader.load("res/" + "1" + ".json", Laya.Handler.create(this, this.loadgame), null, Laya.Loader.JSON); });
-        //this.startui.helpButton.on(Laya.Event.MOUSE_DOWN,this,this.help);
-        Laya.stage.addChild(this.startui);
-    };
-    LayaAir3D.prototype.loadgame = function () {
-        this.gamelogic = new game("1");
-        this.gameui = new ui.gameUI();
-        this.gameui.upbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.UP]);
-        this.gameui.downbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.DOWN]);
-        this.gameui.leftbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.LEFT]);
-        this.gameui.rightbutton.on(Laya.Event.MOUSE_DOWN, this, this.move, [Operation.RIGHT]);
-        this.gameui.pausebutton.on(Laya.Event.MOUSE_DOWN, this, this.pause);
-        Laya.stage.removeChild(this.startui);
-        Laya.stage.addChild(this.gameui);
-        this.currentGame = new GameView("res/map_0.json");
-    };
-    LayaAir3D.prototype.move = function (direction) {
-        this.gamelogic.move(direction);
-        this.currentGame.addMessage(direction);
-    };
-    LayaAir3D.prototype.pause = function () {
-        this.pauseui = new ui.pauseUI();
-        this.pauseui.backToMain.on(Laya.Event.MOUSE_DOWN, this, this.backtomain);
-        Laya.stage.addChild(this.pauseui);
-    };
-    LayaAir3D.prototype.backtomain = function () {
-<<<<<<< Updated upstream
-=======
-        delete (this.currentGame);
->>>>>>> Stashed changes
-        this.pauseui.close();
-        Laya.stage.removeChild(this.gameui);
-        this.gameui.destroy();
-        Laya.stage.addChild(this.startui);
-    };
     return LayaAir3D;
 }());
 new LayaAir3D();

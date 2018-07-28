@@ -16,8 +16,13 @@ var MenuView = /** @class */ (function () {
             { url: "button.png", type: Laya.Loader.IMAGE },
             { url: "btn_close.png", type: Laya.Loader.IMAGE },
             { url: "sound/bgm.mp3", type: Laya.Loader.SOUND }];
+        this.login();
         Laya.loader.load(res, Laya.Handler.create(this, this.loadUI), null);
     }
+    MenuView.prototype.login = function () {
+        this.opendata = wx.getOpenDataContext();
+        this.opendata.postMessage({ type: 'init' });
+    };
     MenuView.prototype.loadUI = function () {
         //加载各个界面
         this.loadStartPage();
@@ -41,6 +46,7 @@ var MenuView = /** @class */ (function () {
         this.startPage.downButton.on(Laya.Event.MOUSE_DOWN, this, this.downButtonCLicked);
         this.startPage.leftButton.on(Laya.Event.MOUSE_DOWN, this, this.leftButtonClicked);
         this.startPage.rightButton.on(Laya.Event.MOUSE_DOWN, this, this.rightButtonClicked);
+        this.startPage.ranklistButton.on(Laya.Event.MOUSE_DOWN, this, this.loadRankList);
     };
     MenuView.prototype.loadLogo = function () {
         //加载主界面的logo
@@ -64,6 +70,12 @@ var MenuView = /** @class */ (function () {
         this.pause.backToGame.on(Laya.Event.MOUSE_DOWN, this, this.pauseToGame);
         this.pause.backToMain.on(Laya.Event.MOUSE_DOWN, this, this.pauseToStart);
     };
+    MenuView.prototype.loadRankList = function () {
+        //加载排行榜界面
+        this.ranklist = new view.rankList();
+        this.ranklist.draw();
+        Laya.stage.addChild(this.ranklist);
+    };
     MenuView.prototype.updateSelect = function () {
         //重新加载选关信息
         //this.selectList.update();
@@ -76,7 +88,7 @@ var MenuView = /** @class */ (function () {
     MenuView.prototype.addStartPage = function () {
         Laya.stage.addChild(this.startPage);
         //添加3D画面
-        this.addGame(23);
+        this.addGame(0);
         //添加logo
         this.addLogo();
     };

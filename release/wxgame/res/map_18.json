@@ -1,0 +1,259 @@
+{
+  "light_on": true,
+  "map_length": 10,
+  "map_width": 15,
+  "map": [
+    [
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      5,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      0,
+      3,
+      3,
+      3,
+      3,
+      1,
+      0,
+      0,
+      4,
+      4,
+      0
+    ],
+    [
+      1,
+      7,
+      1,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      1,
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "startpos": [
+    1,
+    1
+  ],
+  "iron_list": [
+    {
+      "iron_pos": [
+        9,
+        6
+      ],
+      "state": true,
+      "off": "right"
+    },
+    {
+      "iron_pos": [
+        9,
+        9
+      ],
+      "state": true,
+      "off": "left"
+    }
+  ],
+  "triggers": [
+    {
+      "switch_pos": [
+        3,
+        13
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "off"
+        },
+        {
+          "index": 1,
+          "type": "off"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        5,
+        12
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "off"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        5,
+        13
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 1,
+          "type": "off"
+        }
+      ]
+    }
+  ],
+  "url_block": "res/block.png",
+  "url_iron": "res/iron.png",
+  "url_muban": "res/muban.png",
+  "url_cube": "res/ice.png",
+  "camera_pos": [
+    2,
+    6,
+    17
+  ],
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
+}
