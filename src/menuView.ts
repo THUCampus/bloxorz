@@ -76,7 +76,7 @@ class MenuView {
         
         let bounds: Laya.Rectangle = this.helpAni.getGraphicBounds();
         this.helpAni.pivot(bounds.width / 2, bounds.height / 2);
-        this.helpAni.pos(Laya.stage.width / 2, Laya.stage.height / 2);
+        this.helpAni.pos(Laya.stage.width / 2, Laya.stage.height * 3 / 4);
     }
     loadSelect () {
         //加载选择界面
