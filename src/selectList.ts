@@ -32,7 +32,7 @@ module myUI{
             let defaultExist: boolean = false;
             let data: Array<Array<number>> = [];
             let i: number;
-            for (i = 1; i < this.levels['total_level']; i++) {
+            for (i = 1; i < this.levels['total_level'] + 1; i++) {
                 if (!defaultExist && this.levels['levels'][i] === -1) {
                     defaultExist = true;
                     this.parent.setCurrentLevel(i-1);

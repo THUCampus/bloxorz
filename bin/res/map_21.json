@@ -266,6 +266,30 @@
       ],
       "state": false,
       "off": "left"
+    },
+    {
+      "iron_pos": [
+        7,
+        0
+      ],
+      "state": true,
+      "off": "right"
+    },
+    {
+      "iron_pos": [
+        8,
+        0
+      ],
+      "state": true,
+      "off": "right"
+    },
+    {
+      "iron_pos": [
+        9,
+        0
+      ],
+      "state": true,
+      "off": "right"
     }
   ],
   "triggers": [

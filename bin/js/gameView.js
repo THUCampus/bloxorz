@@ -871,11 +871,11 @@ var GameView = /** @class */ (function () {
             return State.SUCCESS;
         }
         //踩到轻机关
-        if (this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.LIGHT) {
+        if ((this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z
+            && this.map_info[this.cube1_pos.z][this.cube2_pos.x] === Block.LIGHT)
+            || this.map_info[this.cube1_pos.z][this.cube1_pos.x] === Block.LIGHT
+            || this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.LIGHT) {
             this.controlTriggers(this.getSwitchInfo(this.cube1_pos.x, this.cube1_pos.z));
-        }
-        if (this.map_info[this.cube2_pos.z][this.cube2_pos.x] === Block.LIGHT) {
-            this.controlTriggers(this.getSwitchInfo(this.cube2_pos.x, this.cube2_pos.z));
         }
         //踩到重机关
         if (this.cube1_pos.x === this.cube2_pos.x && this.cube1_pos.z === this.cube2_pos.z

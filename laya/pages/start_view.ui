@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":13,
+    "selecteID":10,
     "props":{"width":1334,"var":"startpage","sceneColor":"#000000","name":"start","height":750},
     "nodeParent":-1,
     "label":"View(startpage)",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":120,"visible":true,"var":"leftButton","stateNum":"2","skin":"arrow_large_4.png","rotation":0,"mouseEnabled":true,"left":50,"height":120,"bottom":20},
+            "props":{"y":670,"x":110,"width":120,"visible":true,"var":"leftButton","stateNum":"2","skin":"arrow_large_4.png","rotation":45,"pivotY":60,"pivotX":60,"mouseEnabled":true,"left":50,"height":120,"bottom":20},
             "nodeParent":1,
             "label":"Button(leftButton)",
             "isDirectory":false,
@@ -28,7 +28,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":120,"var":"downButton","stateNum":"2","skin":"arrow_large_3.png","rotation":0,"right":50,"mouseEnabled":true,"height":120,"bottom":20},
+            "props":{"y":670,"x":1224,"width":120,"var":"downButton","stateNum":"2","skin":"arrow_large_3.png","rotation":-45,"right":50,"pivotY":60,"pivotX":60,"mouseEnabled":true,"height":120,"bottom":20},
             "nodeParent":1,
             "label":"Button(downButton)",
             "isDirectory":false,
@@ -41,7 +41,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":120,"visible":true,"var":"rightButton","stateNum":"2","skin":"arrow_large_1.png","rotation":0,"right":50,"mouseEnabled":true,"height":120,"bottom":240},
+            "props":{"y":450,"x":1224,"width":120,"visible":true,"var":"rightButton","stateNum":"2","skin":"arrow_large_1.png","rotation":-45,"right":50,"pivotY":60,"pivotX":60,"mouseEnabled":true,"height":120,"bottom":240},
             "nodeParent":1,
             "label":"Button(rightButton)",
             "isDirectory":false,
@@ -54,7 +54,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"width":120,"visible":true,"var":"upButton","stateNum":"2","skin":"arrow_large_2.png","rotation":0,"mouseEnabled":true,"left":50,"height":120,"bottom":240},
+            "props":{"y":450,"x":110,"width":120,"visible":true,"var":"upButton","stateNum":"2","skin":"arrow_large_2.png","rotation":45,"pivotY":60,"pivotX":60,"mouseEnabled":true,"left":50,"height":120,"bottom":240},
             "nodeParent":1,
             "label":"Button(upButton)",
             "isDirectory":false,

@@ -200,6 +200,22 @@
       ],
       "state": false,
       "off": "right"
+    },
+    {
+      "iron_pos": [
+        1,
+        4
+      ],
+      "state": true,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        1,
+        5
+      ],
+      "state": true,
+      "off": "right"
     }
   ],
   "triggers": [

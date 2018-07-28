@@ -1,5 +1,5 @@
 {
-  "light_on": false,
+  "light_on": true,
   "map_length": 6,
   "map_width": 10,
   "map": [

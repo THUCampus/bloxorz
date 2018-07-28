@@ -15,6 +15,9 @@ class MenuView {
     private pageState: Page;
     private currentLevel: number;
     public stepcount: number;
+    //helpAni
+    public helpAniPath: string = "res/helplist.json";
+    public helpAni: Laya.Animation;
 
     constructor () {
         let res: Array<any> = [{url:"arrow_large_1.png",type:Laya.Loader.IMAGE},
@@ -24,7 +27,8 @@ class MenuView {
                             {url:"pause.png",type:Laya.Loader.IMAGE},
                             {url:"button.png",type:Laya.Loader.IMAGE},
                             {url:"btn_close.png",type:Laya.Loader.IMAGE},
-                            {url:"sound/bgm.mp3",type:Laya.Loader.SOUND}];
+                            {url:"sound/bgm.mp3",type:Laya.Loader.SOUND},
+                            {url:this.helpAniPath,type:Laya.Loader.ATLAS}];
         this.login();
         Laya.loader.load(res,Laya.Handler.create(this, this.loadUI), null);
     }
@@ -66,6 +70,13 @@ class MenuView {
     }
     loadHelp () {
         //加载帮助界面
+        this.helpAni = new Laya.Animation();
+        this.helpAni.loadAtlas(this.helpAniPath);
+        this.helpAni.interval = 200;        //间隔 单位 毫秒
+        
+        let bounds: Laya.Rectangle = this.helpAni.getGraphicBounds();
+        this.helpAni.pivot(bounds.width / 2, bounds.height / 2);
+        this.helpAni.pos(Laya.stage.width / 2, Laya.stage.height / 2);
     }
     loadSelect () {
         //加载选择界面
@@ -112,6 +123,9 @@ class MenuView {
     }
     addHelp () {
         //添加帮助界面
+        this.helpAni.index = 1;
+        this.helpAni.play();
+        Laya.stage.addChild(this.helpAni);
     }
     addSelect () {
         //添加选择界面
@@ -138,12 +152,11 @@ class MenuView {
     }
     removeHelp () {
         //移除帮助
-        //Laya.stage.removeChild()
+        Laya.stage.removeChild(this.helpAni);
     }
     removeSelect () {
         //移除选关
         Laya.stage.removeChild(this.selectList.selectListUI);
-        //Laya.stage.removeChild(this.selectList2);
     }
     removeGame () {
         //移除游戏界面

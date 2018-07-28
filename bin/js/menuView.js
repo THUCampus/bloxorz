@@ -8,6 +8,8 @@ var Page;
 ;
 var MenuView = /** @class */ (function () {
     function MenuView() {
+        //helpAni
+        this.helpAniPath = "res/helplist.json";
         var res = [{ url: "arrow_large_1.png", type: Laya.Loader.IMAGE },
             { url: "arrow_large_2.png", type: Laya.Loader.IMAGE },
             { url: "arrow_large_3.png", type: Laya.Loader.IMAGE },
@@ -15,7 +17,8 @@ var MenuView = /** @class */ (function () {
             { url: "pause.png", type: Laya.Loader.IMAGE },
             { url: "button.png", type: Laya.Loader.IMAGE },
             { url: "btn_close.png", type: Laya.Loader.IMAGE },
-            { url: "sound/bgm.mp3", type: Laya.Loader.SOUND }];
+            { url: "sound/bgm.mp3", type: Laya.Loader.SOUND },
+            { url: this.helpAniPath, type: Laya.Loader.ATLAS }];
         this.login();
         Laya.loader.load(res, Laya.Handler.create(this, this.loadUI), null);
     }
@@ -54,6 +57,12 @@ var MenuView = /** @class */ (function () {
     };
     MenuView.prototype.loadHelp = function () {
         //加载帮助界面
+        this.helpAni = new Laya.Animation();
+        this.helpAni.loadAtlas(this.helpAniPath);
+        this.helpAni.interval = 200; //间隔 单位 毫秒
+        var bounds = this.helpAni.getGraphicBounds();
+        this.helpAni.pivot(bounds.width / 2, bounds.height / 2);
+        this.helpAni.pos(Laya.stage.width / 2, Laya.stage.height / 2);
     };
     MenuView.prototype.loadSelect = function () {
         //加载选择界面
@@ -98,6 +107,9 @@ var MenuView = /** @class */ (function () {
     };
     MenuView.prototype.addHelp = function () {
         //添加帮助界面
+        this.helpAni.index = 1;
+        this.helpAni.play();
+        Laya.stage.addChild(this.helpAni);
     };
     MenuView.prototype.addSelect = function () {
         //添加选择界面
@@ -123,12 +135,11 @@ var MenuView = /** @class */ (function () {
     };
     MenuView.prototype.removeHelp = function () {
         //移除帮助
-        //Laya.stage.removeChild()
+        Laya.stage.removeChild(this.helpAni);
     };
     MenuView.prototype.removeSelect = function () {
         //移除选关
         Laya.stage.removeChild(this.selectList.selectListUI);
-        //Laya.stage.removeChild(this.selectList2);
     };
     MenuView.prototype.removeGame = function () {
         //移除游戏界面
