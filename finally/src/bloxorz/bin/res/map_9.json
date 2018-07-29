@@ -1,0 +1,221 @@
+{
+  "light_on": true,
+  "map_length": 10,
+  "map_width": 13,
+  "map": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      5
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      5,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      7,
+      1,
+      2,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "startpos": [
+    6,
+    2
+  ],
+  "iron_list": [
+    {
+      "iron_pos": [
+        4,
+        6
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        2,
+        12
+      ],
+      "state": false,
+      "off": "left"
+    }
+  ],
+  "triggers": [
+    {
+      "switch_pos": [
+        0,
+        12
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "on"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        2,
+        6
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 1,
+          "type": "on"
+        }
+      ]
+    }
+  ],
+  "url_block": "res/block.png",
+  "url_iron": "res/iron.png",
+  "url_muban": "res/muban.png",
+  "url_cube": "res/ice.png",
+  "camera_pos": [
+    3,
+    4,
+    14
+  ],
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
+}

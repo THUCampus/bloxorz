@@ -1,0 +1,283 @@
+{
+  "light_on": true,
+  "map_length": 10,
+  "map_width": 14,
+  "map": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      7,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      4,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      5,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      5,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "startpos": [
+    3,
+    1
+  ],
+  "iron_list": [
+    {
+      "iron_pos": [
+        3,
+        12
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        7,
+        2
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        7,
+        2
+      ],
+      "state": true,
+      "off": "right"
+    }
+  ],
+  "triggers": [
+    {
+      "switch_pos": [
+        2,
+        6
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "off"
+        },
+        {
+          "index": 1,
+          "type": "off"
+        },
+        {
+          "index": 2,
+          "type": "off"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        3,
+        4
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "off"
+        },
+        {
+          "index": 1,
+          "type": "off"
+        },
+        {
+          "index": 2,
+          "type": "off"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        9,
+        2
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "on"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        9,
+        9
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 1,
+          "type": "on"
+        }
+      ]
+    }
+  ],
+  "url_block": "res/block.png",
+  "url_iron": "res/iron.png",
+  "url_muban": "res/muban.png",
+  "url_cube": "res/ice.png",
+  "camera_pos": [
+    2,
+    6,
+    16
+  ],
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
+}

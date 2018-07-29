@@ -1,0 +1,255 @@
+{
+  "light_on": true,
+  "map_length": 10,
+  "map_width": 14,
+  "map": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    [
+      1,
+      2,
+      2,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      5,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      7,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      5
+    ]
+  ],
+  "startpos": [
+    2,
+    4
+  ],
+  "iron_list": [
+    {
+      "iron_pos": [
+        2,
+        1
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        2,
+        2
+      ],
+      "state": false,
+      "off": "right"
+    },
+    {
+      "iron_pos": [
+        3,
+        1
+      ],
+      "state": false,
+      "off": "left"
+    },
+    {
+      "iron_pos": [
+        3,
+        2
+      ],
+      "state": false,
+      "off": "right"
+    }
+  ],
+  "triggers": [
+    {
+      "switch_pos": [
+        3,
+        12
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 0,
+          "type": "on"
+        },
+        {
+          "index": 1,
+          "type": "on"
+        }
+      ]
+    },
+    {
+      "switch_pos": [
+        9,
+        13
+      ],
+      "once": false,
+      "used": false,
+      "control_list": [
+        {
+          "index": 2,
+          "type": "on"
+        },
+        {
+          "index": 3,
+          "type": "on"
+        }
+      ]
+    }
+  ],
+  "url_block": "res/block.png",
+  "url_iron": "res/iron.png",
+  "url_muban": "res/muban.png",
+  "url_cube": "res/ice.png",
+  "camera_pos": [
+    3,
+    5,
+    16
+  ],
+  "url_switch_light": "res/switch_light.png",
+  "url_switch_heavy": "res/switch_heavy.png",
+  "url_switch_split": "res/switch_split.png"
+}
